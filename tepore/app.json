@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Tepore",
+    "slug": "tepore",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "tepore",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "com.tepore.app",
+      "supportsTablet": false,
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "usesAppleSignIn": true,
+      "infoPlist": { "ITSAppUsesNonExemptEncryption": false }
+    },
+    "android": {
+      "package": "com.tepore.app",
+      "googleServicesFile": "./google-services.json",
+      "edgeToEdgeEnabled": true
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-apple-authentication",
+      "@react-native-google-signin/google-signin",
+      "expo-notifications",
+      "expo-localization"
+    ],
+    "experiments": { "typedRoutes": false }
+  }
+}
