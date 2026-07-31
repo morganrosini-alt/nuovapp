@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import { useHousehold } from "../hooks/useHousehold";
 import { ascoltaTipiRifiuto, lettereAttiveInGiorno, coloreTestoLeggibile } from "../services/immondizia";
 import { TipoRifiutoPersonalizzato, GiornoSettimana } from "../types";
+import { fonts } from "../theme";
 
 const INDICE_JS_TO_GIORNO: GiornoSettimana[] = [
   "domenica", "lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato",
@@ -179,7 +180,7 @@ function formatGiornoCompleto(data: Date): string {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF8F3" },
+  container: { flex: 1, backgroundColor: "#F5F8FA" },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -189,23 +190,23 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   headerButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   headerButtonPlaceholder: { width: 90 },
-  headerButtonText: { color: "#fff", fontSize: 14, fontWeight: "600" },
-  title: { fontSize: 18, fontWeight: "700", color: "#3A2E28" },
+  headerButtonText: { color: "#fff", fontSize: 14, fontFamily: fonts.semibold, fontWeight: "600" },
+  title: { fontSize: 18, fontFamily: fonts.bold, fontWeight: "700", color: "#2F4858" },
   list: { paddingHorizontal: 20, paddingBottom: 40 },
   separatore: {
     marginTop: 16,
     marginBottom: 8,
     paddingBottom: 6,
     borderBottomWidth: 2,
-    borderBottomColor: "#EEE0D5",
+    borderBottomColor: "#E2E9EE",
   },
-  separatoreText: { fontSize: 13, fontWeight: "700", color: "#D97742", letterSpacing: 1 },
+  separatoreText: { fontSize: 13, fontFamily: fonts.bold, fontWeight: "700", color: "#336699", letterSpacing: 1 },
   dayRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -216,11 +217,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 6,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
-  dayRowOggi: { backgroundColor: "#FFF3E9", borderColor: "#D97742" },
-  dayLabel: { fontSize: 14, color: "#3A2E28", fontWeight: "500" },
-  dayLabelOggi: { fontWeight: "700", color: "#D97742" },
+  dayRowOggi: { backgroundColor: "#DCEBF3", borderColor: "#336699" },
+  dayLabel: { fontSize: 14, color: "#2F4858", fontFamily: fonts.medium, fontWeight: "500" },
+  dayLabelOggi: { fontFamily: fonts.bold, fontWeight: "700", color: "#336699" },
   dayValueRow: { flexDirection: "row", gap: 4 },
   dayBadge: {
     minWidth: 26,
@@ -230,8 +231,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 5,
     borderWidth: 0.75,
-    borderColor: "#3A2E28",
+    borderColor: "#2F4858",
   },
-  dayBadgeText: { fontSize: 12, fontWeight: "700" },
-  dayValueVuoto: { fontSize: 14, color: "#C9BBAE" },
+  dayBadgeText: { fontSize: 12, fontFamily: fonts.bold, fontWeight: "700" },
+  dayValueVuoto: { fontSize: 14, color: "#C2CCD3" },
 });

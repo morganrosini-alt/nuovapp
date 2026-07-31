@@ -17,6 +17,7 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useHousehold } from "../hooks/useHousehold";
+import { fonts } from "../theme";
 import {
   creaRaccoltaStraordinaria,
   aggiornaRaccoltaStraordinaria,
@@ -81,7 +82,7 @@ export default function RaccoltaStraordinariaFormScreen() {
   if (isLoadingEsistente) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator color="#D97742" />
+        <ActivityIndicator color="#336699" />
       </View>
     );
   }
@@ -152,8 +153,8 @@ export default function RaccoltaStraordinariaFormScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF8F3" },
-  loadingContainer: { flex: 1, backgroundColor: "#FFF8F3", justifyContent: "center", alignItems: "center" },
+  container: { flex: 1, backgroundColor: "#F5F8FA" },
+  loadingContainer: { flex: 1, backgroundColor: "#F5F8FA", justifyContent: "center", alignItems: "center" },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -163,18 +164,18 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   headerButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 8,
     minWidth: 70,
     alignItems: "center",
   },
-  headerButtonText: { color: "#fff", fontSize: 14, fontWeight: "600" },
-  title: { fontSize: 15, fontWeight: "700", color: "#3A2E28" },
+  headerButtonText: { color: "#fff", fontSize: 14, fontFamily: fonts.semibold, fontWeight: "600" },
+  title: { fontSize: 15, fontFamily: fonts.bold, fontWeight: "700", color: "#2F4858" },
   scroll: { flex: 1 },
   content: { paddingHorizontal: 20, paddingBottom: 60 },
-  label: { fontSize: 13, fontWeight: "600", color: "#7A6A60", marginBottom: 8, marginTop: 16 },
+  label: { fontSize: 13, fontFamily: fonts.semibold, fontWeight: "600", color: "#6C7A85", marginBottom: 8, marginTop: 16 },
   input: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   dateButton: {
     backgroundColor: "#fff",
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   datePickerIosRow: {
     backgroundColor: "#fff",
@@ -198,9 +199,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
     alignItems: "flex-start",
   },
-  dateButtonText: { fontSize: 16, color: "#3A2E28" },
-  errorText: { color: "#C0392B", fontSize: 13, marginTop: 16, textAlign: "center" },
+  dateButtonText: { fontSize: 16, color: "#2F4858" },
+  errorText: { color: "#D96A5B", fontSize: 13, marginTop: 16, textAlign: "center" },
 });

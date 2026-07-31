@@ -7,6 +7,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useHousehold } from "../hooks/useHousehold";
 import { getHouseholdsByIds, leaveHousehold } from "../services/household";
 import { Household } from "../types";
+import { fonts } from "../theme";
 
 export default function EsciCasaScreen() {
   const { user } = useAuth();
@@ -67,7 +68,7 @@ export default function EsciCasaScreen() {
       </Text>
 
       {isLoading ? (
-        <ActivityIndicator color="#D97742" style={{ marginTop: 30 }} />
+        <ActivityIndicator color="#336699" style={{ marginTop: 30 }} />
       ) : (
         <FlatList
           data={households}
@@ -87,7 +88,7 @@ export default function EsciCasaScreen() {
                 </Text>
               </View>
               {leavingId === item.id ? (
-                <ActivityIndicator color="#C0392B" />
+                <ActivityIndicator color="#D96A5B" />
               ) : (
                 <Text style={styles.leaveLabel}>Esci</Text>
               )}
@@ -102,7 +103,7 @@ export default function EsciCasaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   header: {
     flexDirection: "row",
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   headerButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -124,16 +125,16 @@ const styles = StyleSheet.create({
   headerButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   title: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   subtitle: {
     fontSize: 13,
-    color: "#9A8A80",
+    color: "#6C7A85",
     textAlign: "center",
     paddingHorizontal: 30,
     marginBottom: 16,
@@ -152,21 +153,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#F0C0C0",
+    borderColor: "#F3C4BD",
   },
   householdName: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#3A2E28",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#2F4858",
   },
   householdMembers: {
     fontSize: 12,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginTop: 2,
   },
   leaveLabel: {
     fontSize: 13,
-    fontWeight: "700",
-    color: "#C0392B",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#D96A5B",
   },
 });

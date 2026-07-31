@@ -10,14 +10,14 @@ import {
   StyleSheet, Alert, KeyboardAvoidingView, Platform,
 } from "react-native";
 import { router } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Icona from "../components/Icona";
 import { useAuth } from "../hooks/useAuth";
 import { useHousehold } from "../hooks/useHousehold";
 import {
   ascoltaBacheca, creaNota, eliminaNota, aggiornaNota, toggleChecklistItem,
 } from "../services/bacheca";
 import { NotaBacheca } from "../types";
-import { colors, radius, shadow } from "../theme";
+import { colors, radius, shadow, fonts } from "../theme";
 
 export default function BachecaScreen() {
   const { user } = useAuth();
@@ -95,7 +95,7 @@ export default function BachecaScreen() {
             returnKeyType="done"
           />
           <TouchableOpacity style={styles.bottoneAggiungi} onPress={aggiungi}>
-            <MaterialCommunityIcons name="plus" size={22} color="#fff" />
+            <Icona name="plus" size={22} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -115,7 +115,7 @@ export default function BachecaScreen() {
           <View style={[styles.card, item.fissata && styles.cardFissata]}>
             <View style={styles.cardHeader}>
               <TouchableOpacity onPress={() => aggiornaNota(item.id, { fissata: !item.fissata })}>
-                <MaterialCommunityIcons
+                <Icona
                   name={item.fissata ? "pin" : "pin-outline"}
                   size={18}
                   color={item.fissata ? colors.accent : colors.muted}
@@ -123,7 +123,7 @@ export default function BachecaScreen() {
               </TouchableOpacity>
               {item.autore === user?.uid && (
                 <TouchableOpacity onPress={() => chiediElimina(item)}>
-                  <MaterialCommunityIcons name="trash-can-outline" size={18} color={colors.danger} />
+                  <Icona name="trash-can-outline" size={18} color={colors.danger} />
                 </TouchableOpacity>
               )}
             </View>
@@ -137,7 +137,7 @@ export default function BachecaScreen() {
                   style={styles.rigaCheck}
                   onPress={() => user && toggleChecklistItem(item, i, user.uid)}
                 >
-                  <MaterialCommunityIcons
+                  <Icona
                     name={el.fatto ? "checkbox-marked-outline" : "checkbox-blank-outline"}
                     size={20}
                     color={el.fatto ? colors.success : colors.muted}
@@ -165,8 +165,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent, borderRadius: radius.sm,
     paddingVertical: 8, paddingHorizontal: 12, width: 90, alignItems: "center",
   },
-  bottoneHeaderTesto: { color: "#fff", fontWeight: "600", fontSize: 14 },
-  titolo: { fontSize: 20, fontWeight: "800", color: colors.ink },
+  bottoneHeaderTesto: { color: "#fff", fontFamily: fonts.semibold, fontWeight: "600", fontSize: 14 },
+  titolo: { fontSize: 20, fontFamily: fonts.extrabold, fontWeight: "800", color: colors.ink },
   composer: { paddingHorizontal: 16, paddingBottom: 8 },
   switchTipo: { flexDirection: "row", gap: 8, marginBottom: 8 },
   chipTipo: {
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.chipNeutral,
   },
   chipTipoAttivo: { backgroundColor: colors.accent },
-  chipTipoTesto: { color: colors.chipNeutralInk, fontSize: 13, fontWeight: "600" },
+  chipTipoTesto: { color: colors.chipNeutralInk, fontSize: 13, fontFamily: fonts.semibold, fontWeight: "600" },
   chipTipoTestoAttivo: { color: "#fff" },
   rigaInput: { flexDirection: "row", gap: 8 },
   input: {

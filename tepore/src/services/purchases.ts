@@ -16,6 +16,7 @@
 // nel README): app a bassa permanenza + contenuti intimi = niente ads.
 
 import { Platform } from "react-native";
+import { FLAGS } from "../config/flags";
 
 export type ModuloPremium = "veicoli" | "animali" | "piante" | "statistiche";
 export const ENTITLEMENT_BUNDLE = "casa_completa";
@@ -47,19 +48,30 @@ export async function initPurchases(uid: string): Promise<void> {
   }
 }
 
-/** Set dei moduli sbloccati per l'utente corrente (bundle incluso). */
+const TUTTI: ModuloPremium[] = ["veicoli", "animali", "piante", "statistiche"];
+
+/**
+ * Set dei moduli sbloccati per l'utente corrente (bundle incluso).
+ *
+ * IN SVILUPPO SONO TUTTI SBLOCCATI. Motivo pratico: finché il negozio
+ * RevenueCat non è configurato non esiste alcun acquisto possibile, quindi
+ * Veicoli, Animali, Piante e Statistiche rimanderebbero sempre al paywall e
+ * sembrerebbero "rotti" durante i test. In produzione (__DEV__ falso) vale
+ * solo ciò che l'utente ha davvero acquistato.
+ */
 export async function moduliSbloccati(): Promise<Set<ModuloPremium>> {
+  // __DEV__            = sviluppo (Expo Go / dev server)
+  // FLAGS.SBLOCCA_TUTTO = build di collaudo, impostato da eas.json
+  // In produzione entrambi sono falsi e vale solo ciò che è stato acquistato.
+  if (__DEV__ || FLAGS.SBLOCCA_TUTTO) return new Set(TUTTI);
+
   const Purchases = getPurchases();
   if (!Purchases || !configured) return new Set();
   try {
     const info = await Purchases.getCustomerInfo();
     const attivi: string[] = Object.keys(info?.entitlements?.active ?? {});
-    if (attivi.includes(ENTITLEMENT_BUNDLE)) {
-      return new Set(["veicoli", "animali", "piante", "statistiche"]);
-    }
-    return new Set(attivi.filter((e): e is ModuloPremium =>
-      ["veicoli", "animali", "piante", "statistiche"].includes(e)
-    ));
+    if (attivi.includes(ENTITLEMENT_BUNDLE)) return new Set(TUTTI);
+    return new Set(attivi.filter((e): e is ModuloPremium => TUTTI.includes(e as ModuloPremium)));
   } catch {
     return new Set();
   }

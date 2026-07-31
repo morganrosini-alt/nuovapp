@@ -1,25 +1,38 @@
 // src/app/_layout.tsx
+//
+// Layout radice: provider, guardia di autenticazione e navigatore Stack.
+// Le 4 sezioni principali vivono dentro il gruppo (tabs); ogni modulo
+// (bollette, turni, salute…) è una schermata di stack che si apre sopra.
 
 import React, { useEffect } from "react";
-import { Slot, useRouter, useSegments } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
+import {
+  useFonts,
+  Nunito_300Light, Nunito_400Regular, Nunito_500Medium,
+  Nunito_600SemiBold, Nunito_700Bold, Nunito_800ExtraBold, Nunito_900Black,
+} from "@expo-google-fonts/nunito";
+import { applicaFontGlobale } from "../theme/font";
 import { AuthProvider, useAuth } from "../hooks/useAuth";
 import { HouseholdProvider, useHousehold } from "../hooks/useHousehold";
 import { registraPushToken } from "../services/notifications";
+import { usePromemoria } from "../hooks/usePromemoria";
 import { ensureKeypair } from "../services/crypto";
 import { initPurchases } from "../services/purchases";
+import { colors } from "../theme";
 
 function RootNavigation() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const { profile, isLoading: isHouseholdLoading } = useHousehold();
+
+  usePromemoria(profile?.householdId, user?.uid);
   const router = useRouter();
   const segments = useSegments();
 
   const isLoading = isAuthLoading || (user != null && isHouseholdLoading);
 
-  // Al login: registra il token push, garantisce l'identità E2E (chiavi
-  // per la Zona Intima) e inizializza gli acquisti. Tutto best-effort:
-  // se una di queste fallisce (offline, permesso negato), l'app va avanti.
+  // Al login: token push, identità E2E e acquisti. Best-effort: se una di
+  // queste fallisce (offline, permesso negato), l'app prosegue comunque.
   useEffect(() => {
     if (!user) return;
     registraPushToken(user.uid).catch(() => {});
@@ -30,45 +43,57 @@ function RootNavigation() {
   useEffect(() => {
     if (isLoading) return;
 
-    const currentScreen = segments[0];
-    const isOnLoginScreen = currentScreen === "login";
-    const isOnHouseholdSetupScreen = currentScreen === "household-setup";
+    const primo = segments[0];
+    const suLogin = primo === "login";
+    const suSetup = primo === "household-setup";
 
     if (!user) {
-      if (!isOnLoginScreen) {
-        router.replace("/login");
-      }
+      if (!suLogin) router.replace("/login");
       return;
     }
-
-    const hasHousehold = profile?.householdId != null;
-
-    if (!hasHousehold && !isOnHouseholdSetupScreen) {
-      // Primo accesso: nessuna casa ancora -> portalo alla creazione forzata
+    const haCasa = profile?.householdId != null;
+    if (!haCasa && !suSetup) {
       router.replace("/household-setup");
-    } else if (hasHousehold && isOnLoginScreen) {
-      // Già loggato con una casa attiva, ma finito sul login -> vai alla home
+    } else if (haCasa && suLogin) {
       router.replace("/");
     }
-    // NOTA: qui prima c'era anche "hasHousehold && isOnHouseholdSetupScreen
-    // -> replace('/')", che rimandava sempre alla home chi aveva già una
-    // household. L'abbiamo tolto apposta: ora household-setup è anche una
-    // schermata raggiungibile volontariamente (es. "Aggiungi Casa" dal
-    // profilo) e gestisce da sola la navigazione di uscita dopo il successo.
   }, [user, profile, isLoading, segments]);
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#D97742" />
+      <View style={styles.caricamento}>
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }
 
-  return <Slot />;
+  return (
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="login" />
+      <Stack.Screen name="household-setup" />
+    </Stack>
+  );
 }
 
 export default function RootLayout() {
+  // Nunito: caricato una volta all'avvio. Finché non è pronto mostriamo lo
+  // spinner, altrimenti il testo comparirebbe col font di sistema per un
+  // istante e poi "salterebbe" — l'effetto è sgradevole.
+  const [fontPronti] = useFonts({
+    Nunito_300Light, Nunito_400Regular, Nunito_500Medium,
+    Nunito_600SemiBold, Nunito_700Bold, Nunito_800ExtraBold, Nunito_900Black,
+  });
+
+  if (!fontPronti) {
+    return (
+      <View style={styles.caricamento}>
+        <ActivityIndicator size="large" color={colors.accent} />
+      </View>
+    );
+  }
+  applicaFontGlobale();
+
   return (
     <AuthProvider>
       <HouseholdProvider>
@@ -79,10 +104,8 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFF8F3",
+  caricamento: {
+    flex: 1, justifyContent: "center", alignItems: "center",
+    backgroundColor: colors.background,
   },
 });

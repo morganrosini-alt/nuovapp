@@ -11,16 +11,24 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Configurazione presa dalla console Firebase (progetto "Tepore").
-// La apiKey non è un segreto: Firebase è progettato per essere sicuro
-// tramite le regole di Firestore/Storage, non nascondendo questa chiave.
+// Configurazione del progetto Firebase "housekeep-9b194".
+//
+// ⚠️ ALLINEAMENTO (31/07): prima qui c'era il progetto "tepore-96890", mentre
+// google-services.json, GoogleService-Info.plist, .firebaserc e il client ID
+// di Google puntavano tutti a "housekeep-9b194". Il risultato era che l'app
+// leggeva e scriveva su un progetto, mentre login Google, Cloud Functions e
+// regole di sicurezza vivevano sull'altro. Ora la sorgente unica di verità è
+// housekeep-9b194, cioè il progetto che contiene davvero i dati.
+//
+// I valori qui sotto sono ricavati da google-services.json. La apiKey non è
+// un segreto: la sicurezza è affidata alle regole Firestore, non a nasconderla.
 const firebaseConfig = {
-  apiKey: "AIzaSyCf1GB93KX7NNvuXQAw4t3R2q8SVOHYqoA",
-  authDomain: "tepore-96890.firebaseapp.com",
-  projectId: "tepore-96890",
-  storageBucket: "tepore-96890.firebasestorage.app",
-  messagingSenderId: "468316700272",
-  appId: "1:468316700272:web:8b7121b616472185957eb5",
+  apiKey: "AIzaSyAo5jcBSbfrR5SqZZaGy84Yn_MDocRNcqA",
+  authDomain: "housekeep-9b194.firebaseapp.com",
+  projectId: "housekeep-9b194",
+  storageBucket: "housekeep-9b194.firebasestorage.app",
+  messagingSenderId: "623187342308",
+  appId: "1:623187342308:android:ba8a6e14d6c70093268df1",
 };
 
 // Evita di inizializzare Firebase più volte durante l'hot-reload in sviluppo

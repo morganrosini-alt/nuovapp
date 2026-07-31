@@ -8,12 +8,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList } from "react-native";
 import * as Clipboard from "expo-clipboard";
-import { Ionicons } from "@expo/vector-icons";
+import Icona from "../components/Icona";
 import { router } from "expo-router";
 import { useAuth } from "../hooks/useAuth";
 import { useHousehold } from "../hooks/useHousehold";
 import { getHousehold, getUserProfilesByIds } from "../services/household";
 import { Household, UserProfile } from "../types";
+import { fonts } from "../theme";
 
 export default function PartecipantiScreen() {
   const { user } = useAuth();
@@ -68,10 +69,10 @@ export default function PartecipantiScreen() {
                   <Text style={styles.inviteCodeValue}>{household.inviteCode}</Text>
                 </View>
                 <TouchableOpacity onPress={handleCopiaCodice} hitSlop={10}>
-                  <Ionicons
-                    name={copiato ? "checkmark" : "copy-outline"}
+                  <Icona
+                    name={copiato ? "check" : "content-copy"}
                     size={22}
-                    color={copiato ? "#4A9D6E" : "#3A2E28"}
+                    color={copiato ? "#2E7D32" : "#2F4858"}
                   />
                 </TouchableOpacity>
               </View>
@@ -85,7 +86,7 @@ export default function PartecipantiScreen() {
       )}
 
       {isLoading ? (
-        <ActivityIndicator color="#D97742" style={{ marginTop: 30 }} />
+        <ActivityIndicator color="#336699" style={{ marginTop: 30 }} />
       ) : (
         <FlatList
           data={membri}
@@ -121,7 +122,7 @@ export default function PartecipantiScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   header: {
     flexDirection: "row",
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   headerButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -143,16 +144,16 @@ const styles = StyleSheet.create({
   headerButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   title: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   householdName: {
     fontSize: 13,
-    color: "#9A8A80",
+    color: "#6C7A85",
     textAlign: "center",
     marginBottom: 12,
   },
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   inviteCodeRow: {
     flexDirection: "row",
@@ -175,18 +176,18 @@ const styles = StyleSheet.create({
   },
   inviteCodeLabel: {
     fontSize: 12,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginBottom: 4,
   },
   inviteCodeValue: {
     fontSize: 22,
-    fontWeight: "700",
-    color: "#D97742",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#336699",
     letterSpacing: 4,
   },
   inviteCodeRestricted: {
     fontSize: 13,
-    color: "#9A8A80",
+    color: "#6C7A85",
     textAlign: "center",
     lineHeight: 18,
   },
@@ -202,13 +203,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   avatar: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -216,30 +217,30 @@ const styles = StyleSheet.create({
   avatarText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "700",
+    fontFamily: fonts.bold, fontWeight: "700",
   },
   memberInfo: {
     flex: 1,
   },
   memberName: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#3A2E28",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#2F4858",
   },
   memberEmail: {
     fontSize: 12,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginTop: 2,
   },
   ownerBadge: {
-    backgroundColor: "#FFE8D6",
+    backgroundColor: "#DCEBF3",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   ownerBadgeText: {
     fontSize: 10,
-    fontWeight: "700",
-    color: "#D97742",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#336699",
   },
 });

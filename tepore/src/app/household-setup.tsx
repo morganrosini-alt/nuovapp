@@ -22,6 +22,7 @@ import { router } from "expo-router";
 import { useAuth } from "../hooks/useAuth";
 import { useHousehold } from "../hooks/useHousehold";
 import { createHousehold, joinHouseholdByInviteCode } from "../services/household";
+import { fonts } from "../theme";
 
 type Mode = "choice" | "create" | "join";
 
@@ -241,14 +242,14 @@ export default function HouseholdSetupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
   },
   headerButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
   headerButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   content: {
     flex: 1,
@@ -266,14 +267,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
     textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: "#7A6A60",
+    color: "#6C7A85",
     textAlign: "center",
     marginBottom: 28,
     lineHeight: 20,
@@ -286,13 +287,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   inviteCodeInput: {
     textAlign: "center",
     fontSize: 22,
     letterSpacing: 4,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   checkboxRow: {
     flexDirection: "row",
@@ -304,33 +305,33 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: "#D97742",
+    borderColor: "#336699",
     marginRight: 10,
     alignItems: "center",
     justifyContent: "center",
   },
   checkboxChecked: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
   },
   checkboxTick: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold, fontWeight: "700",
   },
   checkboxLabel: {
     fontSize: 13,
-    color: "#3A2E28",
+    color: "#2F4858",
     flex: 1,
     lineHeight: 18,
   },
   errorText: {
-    color: "#C0392B",
+    color: "#D96A5B",
     fontSize: 13,
     marginBottom: 12,
     textAlign: "center",
   },
   primaryButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   secondaryButton: {
     backgroundColor: "#fff",
@@ -348,19 +349,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 12,
     borderWidth: 1,
-    borderColor: "#D97742",
+    borderColor: "#336699",
   },
   secondaryButtonText: {
-    color: "#D97742",
+    color: "#336699",
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   backLink: {
     marginTop: 20,
     alignItems: "center",
   },
   backText: {
-    color: "#7A6A60",
+    color: "#6C7A85",
     fontSize: 14,
   },
   logoutLink: {

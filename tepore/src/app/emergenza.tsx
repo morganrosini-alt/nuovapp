@@ -18,8 +18,9 @@ import {
 import * as Localization from "expo-localization";
 import * as Clipboard from "expo-clipboard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
+import Icona from "../components/Icona";
 import { router } from "expo-router";
+import { fonts } from "../theme";
 import {
   PAESI_EMERGENZA,
   PAESE_FALLBACK,
@@ -115,10 +116,10 @@ export default function EmergenzaScreen() {
               <Text style={styles.numberValue}>{item.numero}</Text>
             </View>
             <TouchableOpacity onPress={() => handleCopiaNumero(item.numero)} hitSlop={10}>
-              <Ionicons
+              <Icona
                 name={copiatoNumero === item.numero ? "checkmark" : "copy-outline"}
                 size={22}
-                color={copiatoNumero === item.numero ? "#4A9D6E" : "#3A2E28"}
+                color={copiatoNumero === item.numero ? "#2E7D32" : "#2F4858"}
               />
             </TouchableOpacity>
           </View>
@@ -131,7 +132,7 @@ export default function EmergenzaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   header: {
     flexDirection: "row",
@@ -142,7 +143,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   headerButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -153,17 +154,17 @@ const styles = StyleSheet.create({
   headerButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   title: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   sectionLabel: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#7A6A60",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#6C7A85",
     paddingHorizontal: 20,
     marginBottom: 8,
   },
@@ -182,16 +183,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 8,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   countryChipActive: {
-    backgroundColor: "#D97742",
-    borderColor: "#D97742",
+    backgroundColor: "#336699",
+    borderColor: "#336699",
   },
   countryChipText: {
     fontSize: 13,
-    color: "#3A2E28",
-    fontWeight: "500",
+    color: "#2F4858",
+    fontFamily: fonts.medium, fontWeight: "500",
     lineHeight: 16,
     includeFontPadding: false,
     textAlignVertical: "center",
@@ -205,12 +206,12 @@ const styles = StyleSheet.create({
   },
   currentCountryLabel: {
     fontSize: 13,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginBottom: 12,
   },
   currentCountryName: {
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   numberCard: {
     backgroundColor: "#fff",
@@ -221,16 +222,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   numberLabel: {
     fontSize: 13,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginBottom: 4,
   },
   numberValue: {
     fontSize: 22,
-    fontWeight: "700",
-    color: "#D97742",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#336699",
   },
 });

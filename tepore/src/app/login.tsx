@@ -16,8 +16,9 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Icona from "../components/Icona";
 import { useAuth } from "../hooks/useAuth";
+import { fonts } from "../theme";
 
 export default function LoginScreen() {
   const { signIn, signUp, signInWithGoogle, signInWithApple, signInWithFacebook } =
@@ -153,10 +154,10 @@ export default function LoginScreen() {
           disabled={socialLoading !== null}
         >
           {socialLoading === "google" ? (
-            <ActivityIndicator color="#3A2E28" />
+            <ActivityIndicator color="#2F4858" />
           ) : (
             <>
-              <Ionicons name="logo-google" size={20} color="#3A2E28" />
+              <Icona name="logo-google" size={20} color="#2F4858" weight="fill" />
               <Text style={styles.socialButtonText}>Continua con Google</Text>
             </>
           )}
@@ -172,7 +173,7 @@ export default function LoginScreen() {
               <ActivityIndicator color="#fff" />
             ) : (
               <>
-                <Ionicons name="logo-apple" size={20} color="#fff" />
+                <Icona name="logo-apple" size={20} color="#fff" weight="fill" />
                 <Text style={[styles.socialButtonText, styles.appleButtonText]}>
                   Continua con Apple
                 </Text>
@@ -190,7 +191,7 @@ export default function LoginScreen() {
             <ActivityIndicator color="#fff" />
           ) : (
             <>
-              <Ionicons name="logo-facebook" size={20} color="#fff" />
+              <Icona name="logo-facebook" size={20} color="#fff" weight="fill" />
               <Text style={[styles.socialButtonText, styles.facebookButtonText]}>
                 Continua con Facebook
               </Text>
@@ -238,7 +239,7 @@ function traduciErroreFirebase(code?: string): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   content: {
     flex: 1,
@@ -247,14 +248,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 36,
-    fontWeight: "700",
-    color: "#D97742",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#336699",
     textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: "#7A6A60",
+    color: "#6C7A85",
     textAlign: "center",
     marginBottom: 32,
   },
@@ -266,16 +267,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   errorText: {
-    color: "#C0392B",
+    color: "#D96A5B",
     fontSize: 13,
     marginBottom: 12,
     textAlign: "center",
   },
   primaryButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   dividerRow: {
     flexDirection: "row",
@@ -295,10 +296,10 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#EEE0D5",
+    backgroundColor: "#E2E9EE",
   },
   dividerText: {
-    color: "#7A6A60",
+    color: "#6C7A85",
     fontSize: 13,
   },
   socialButton: {
@@ -308,15 +309,15 @@ const styles = StyleSheet.create({
     gap: 10,
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
     borderRadius: 12,
     paddingVertical: 14,
     marginBottom: 10,
   },
   socialButtonText: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#3A2E28",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#2F4858",
   },
   appleButton: {
     backgroundColor: "#000",

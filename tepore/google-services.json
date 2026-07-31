@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "623187342308",
+    "project_id": "housekeep-9b194",
+    "storage_bucket": "housekeep-9b194.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623187342308:android:ba8a6e14d6c70093268df1",
+        "android_client_info": {
+          "package_name": "com.tepore.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623187342308-kcejj1thg5v7a82c5qknqgb5h2n57ocm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tepore.app",
+            "certificate_hash": "cab6d234bcc6a1e1aa2e03c038f3139e5be6939e"
+          }
+        },
+        {
+          "client_id": "623187342308-l9jgcnth4v0n0gqtroviq7bk921umfe5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAo5jcBSbfrR5SqZZaGy84Yn_MDocRNcqA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623187342308-l9jgcnth4v0n0gqtroviq7bk921umfe5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "623187342308-59762libgk2n4m1lmdd6c9hojnemfm6n.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tepore.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

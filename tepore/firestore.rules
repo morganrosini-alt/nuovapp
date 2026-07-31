@@ -1,220 +1,95 @@
 rules_version = '2';
 
-// ============================================================
-// TEPORE — Firestore Security Rules (M0)
-// Sostituisce il "test mode". Deploy: Firebase Console →
-// Firestore Database → Regole → incolla → Pubblica.
+// TEPORE — Regole di sicurezza Firestore
+// Da incollare in: Firebase Console -> Firestore Database -> Regole -> Pubblica
 //
-// Struttura dati REALE del progetto (collezioni top-level con
-// campo householdId, non sotto-collezioni):
-//   users/{uid}
-//   households/{id}
-//   bollette/{id}                  (householdId, createdBy)
-//   immondizia_tipi/{id}           (householdId)
-//   immondizia_straordinarie/{id}  (householdId)
-// Collezioni FUTURE già coperte (roadmap M1-M6):
-//   relationships, bacheca, calendario, spese, salvadanai,
-//   zona_intima
-// ============================================================
+// Principio: solo utenti autenticati, e ogni documento dati e' leggibile o
+// scrivibile solo da chi e' membro della casa (household) a cui appartiene.
+// Sostituisce le regole "modalita' test", che SCADONO dopo 30 giorni e ti
+// spegnerebbero l'app a meta' agosto.
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ---------- Funzioni di supporto ----------
+    // ---------- funzioni di supporto ----------
 
-    function isSignedIn() {
+    function autenticato() {
       return request.auth != null;
     }
 
-    // L'utente è membro della household indicata?
-    // (1 lettura documento per valutazione — costo accettabile)
-    function isMember(hid) {
-      return isSignedIn()
-        && exists(/databases/$(database)/documents/households/$(hid))
+    // E' membro della casa indicata? Legge memberIds dal documento household.
+    // Firestore mette in cache questa get() dentro la stessa valutazione,
+    // quindi anche su una query di 100 bollette conta come una lettura sola.
+    function membroDi(householdId) {
+      return autenticato()
         && request.auth.uid in
-           get(/databases/$(database)/documents/households/$(hid)).data.memberIds;
+           get(/databases/$(database)/documents/households/$(householdId)).data.memberIds;
     }
 
-    // L'utente è uno dei due partner CONFERMATI della relationship?
-    function isPartner(relId) {
-      let rel = get(/databases/$(database)/documents/relationships/$(relId)).data;
-      return isSignedIn()
-        && request.auth.uid in rel.membri
-        && rel.stato == "confermata";
+    // Scorciatoia usata dalle collezioni dati: vale sia in lettura
+    // (documento esistente) sia in scrittura (documento in arrivo).
+    function membroDelDocEsistente() {
+      return membroDi(resource.data.householdId);
     }
 
-    // Il documento in creazione dichiara l'autore corretto?
-    function creatorIsSelf(field) {
-      return request.resource.data[field] == request.auth.uid;
+    function membroDelDocInArrivo() {
+      return membroDi(request.resource.data.householdId);
     }
 
-    // ---------- Utenti ----------
-    // get: consentito a chi è loggato (serve per mostrare nomi dei
-    //      membri nella schermata Partecipanti). list: MAI, per
-    //      impedire l'enumerazione dei profili.
-    // TODO v2: separare i campi pubblici (displayName, publicKey)
-    //          dall'email in una sotto-struttura a visibilità ridotta.
-    match /users/{uid} {
-      allow get: if isSignedIn();
-      allow list: if false;
-      allow create: if isSignedIn() && request.auth.uid == uid;
-      allow update: if isSignedIn() && request.auth.uid == uid;
-      allow delete: if false;   // la cancellazione account passa da flusso dedicato
+    // ---------- profili utente ----------
+    match /users/{userId} {
+      // Ognuno scrive solo il proprio profilo...
+      allow write: if autenticato() && request.auth.uid == userId;
+      // ...ma tutti gli autenticati possono LEGGERE i profili, perche' la
+      // schermata "Partecipanti" mostra nome ed email degli altri membri.
+      allow read: if autenticato();
     }
 
-    // ---------- Households ----------
-    // Lettura solo ai membri. NIENTE list: la ricerca per codice
-    // invito NON avviene più dal client (query enumerabile) ma
-    // tramite la Cloud Function callable `joinHousehold`.
-    // memberIds è INTOCCABILE dal client: join/uscita passano dalle
-    // funzioni `joinHousehold` / `leaveHousehold` (Admin SDK bypassa
-    // le regole in modo controllato).
-    match /households/{hid} {
-      allow get: if isMember(hid);
-      allow list: if false;
+    // ---------- case (household) ----------
+    match /households/{householdId} {
+      // Lettura aperta agli autenticati: serve per entrare con il codice
+      // invito (joinHouseholdByInviteCode fa una query su inviteCode PRIMA
+      // di essere membro — se qui restringiamo, l'adesione si rompe).
+      allow read: if autenticato();
 
-      allow create: if isSignedIn()
-        && creatorIsSelf('ownerId')
-        && request.resource.data.memberIds == [request.auth.uid];
+      allow create: if autenticato()
+        && request.auth.uid in request.resource.data.memberIds;
 
-      // Il proprietario può modificare nome e visibilità del codice,
-      // ma nessun client può toccare memberIds / ownerId / inviteCode.
-      allow update: if isSignedIn()
-        && resource.data.ownerId == request.auth.uid
-        && !request.resource.data.diff(resource.data).affectedKeys()
-             .hasAny(['memberIds', 'ownerId', 'inviteCode']);
+      // Update: o sei gia' membro, oppure ti stai aggiungendo tu stesso
+      // tramite codice invito.
+      allow update: if autenticato()
+        && (request.auth.uid in resource.data.memberIds
+            || request.auth.uid in request.resource.data.memberIds);
 
-      allow delete: if false;   // eliminazione casa: flusso dedicato futuro
+      allow delete: if false; // nessuna cancellazione dall'app, per ora
     }
 
-    // ---------- Moduli household-wide esistenti ----------
-    // Pattern comune: ogni operazione richiede l'appartenenza alla
-    // household referenziata dal documento. In creazione si valida
-    // la household DEL NUOVO documento (request.resource), altrove
-    // quella del documento esistente (resource) — così nessuno può
-    // "spostare" un documento in una casa altrui.
+    // ---------- collezioni dati della casa ----------
+    // Hanno tutte un campo householdId e vengono filtrate per quello.
 
-    match /bollette/{id} {
-      allow read: if isMember(resource.data.householdId);
-      allow create: if isMember(request.resource.data.householdId)
-                    && creatorIsSelf('createdBy');
-      allow update: if isMember(resource.data.householdId)
-                    && request.resource.data.householdId == resource.data.householdId;
-      allow delete: if isMember(resource.data.householdId);
+    match /bollette/{docId} {
+      allow read:   if membroDelDocEsistente();
+      allow create: if membroDelDocInArrivo();
+      allow update: if membroDelDocEsistente() && membroDelDocInArrivo();
+      allow delete: if membroDelDocEsistente();
     }
 
-    match /immondizia_tipi/{id} {
-      allow read: if isMember(resource.data.householdId);
-      allow create: if isMember(request.resource.data.householdId);
-      allow update: if isMember(resource.data.householdId)
-                    && request.resource.data.householdId == resource.data.householdId;
-      allow delete: if isMember(resource.data.householdId);
+    match /immondizia_tipi/{docId} {
+      allow read:   if membroDelDocEsistente();
+      allow create: if membroDelDocInArrivo();
+      allow update: if membroDelDocEsistente() && membroDelDocInArrivo();
+      allow delete: if membroDelDocEsistente();
     }
 
-    match /immondizia_straordinarie/{id} {
-      allow read: if isMember(resource.data.householdId);
-      allow create: if isMember(request.resource.data.householdId);
-      allow update: if isMember(resource.data.householdId)
-                    && request.resource.data.householdId == resource.data.householdId;
-      allow delete: if isMember(resource.data.householdId);
+    match /immondizia_straordinarie/{docId} {
+      allow read:   if membroDelDocEsistente();
+      allow create: if membroDelDocInArrivo();
+      allow update: if membroDelDocEsistente() && membroDelDocInArrivo();
+      allow delete: if membroDelDocEsistente();
     }
 
-    // ---------- Relationships (M1 — coppia) ----------
-    // L'esistenza della coppia è visibile ai membri della casa;
-    // conferma/rifiuto/scioglimento solo dei due diretti interessati.
-    match /relationships/{relId} {
-      allow read: if isMember(resource.data.householdId);
-
-      allow create: if isMember(request.resource.data.householdId)
-        && creatorIsSelf('richiedente')
-        && request.resource.data.stato == "in_attesa"
-        && request.resource.data.membri.size() == 2
-        && request.auth.uid in request.resource.data.membri;
-
-      // Solo i due membri possono aggiornare (conferma, wrappedKeys);
-      // i membri e la household della relationship sono immutabili.
-      allow update: if isSignedIn()
-        && request.auth.uid in resource.data.membri
-        && !request.resource.data.diff(resource.data).affectedKeys()
-             .hasAny(['membri', 'householdId', 'richiedente']);
-
-      allow delete: if isSignedIn()
-        && request.auth.uid in resource.data.membri;
-    }
-
-    // ---------- Bacheca (M3) ----------
-    match /bacheca/{id} {
-      allow read: if isMember(resource.data.householdId);
-      allow create: if isMember(request.resource.data.householdId)
-                    && creatorIsSelf('autore');
-      allow update: if isMember(resource.data.householdId)
-                    && request.resource.data.householdId == resource.data.householdId;
-      allow delete: if isMember(resource.data.householdId)
-                    && resource.data.autore == request.auth.uid;
-    }
-
-    // ---------- Calendario / Spese / Salvadanai (M4-M5) ----------
-    // Contenuti con visibilità a 3 livelli. La visibilità è
-    // applicata QUI, lato server — il client la usa solo per la UI.
-
-    function canSeeScoped() {
-      return isMember(resource.data.householdId) && (
-        resource.data.visibilita == "household"
-        || (resource.data.visibilita == "personale"
-            && resource.data.autore == request.auth.uid)
-        || (resource.data.visibilita == "coppia"
-            && isPartner(resource.data.relationshipId))
-      );
-    }
-
-    function canCreateScoped() {
-      return isMember(request.resource.data.householdId)
-        && creatorIsSelf('autore')
-        && (
-          request.resource.data.visibilita in ["household", "personale"]
-          || (request.resource.data.visibilita == "coppia"
-              && isPartner(request.resource.data.relationshipId))
-        );
-    }
-
-    match /calendario/{id} {
-      allow read: if canSeeScoped();
-      allow create: if canCreateScoped();
-      allow update, delete: if canSeeScoped()
-                            && resource.data.autore == request.auth.uid;
-    }
-
-    match /spese/{id} {
-      allow read: if canSeeScoped();
-      allow create: if canCreateScoped();
-      allow update: if canSeeScoped();   // segnare rate pagate: qualunque avente-visibilità
-      allow delete: if canSeeScoped()
-                    && resource.data.autore == request.auth.uid;
-    }
-
-    match /salvadanai/{id} {
-      allow read: if canSeeScoped();
-      allow create: if canCreateScoped();
-      allow update: if canSeeScoped();   // contributi: chiunque veda l'obiettivo
-      allow delete: if canSeeScoped()
-                    && resource.data.autore == request.auth.uid;
-    }
-
-    // ---------- Zona Intima (M6) ----------
-    // SOLO i due partner confermati. Il contenuto è comunque SEMPRE
-    // ciphertext E2E: anche violando queste regole, il server non ha
-    // mai visto il testo in chiaro.
-    match /zona_intima/{id} {
-      allow read: if isPartner(resource.data.relationshipId);
-      allow create: if isPartner(request.resource.data.relationshipId)
-                    && creatorIsSelf('autore');
-      allow update, delete: if isPartner(resource.data.relationshipId)
-                            && resource.data.autore == request.auth.uid;
-    }
-
-    // ---------- Default: tutto il resto è negato ----------
-    match /{document=**} {
-      allow read, write: if false;
-    }
+    // NOTA: quando aggiungerai nuovi moduli (pulizie, spese, garanzie...)
+    // duplica uno di questi blocchi cambiando solo il nome della collezione.
+    // Tutto cio' che non e' elencato qui e' vietato per default.
   }
 }

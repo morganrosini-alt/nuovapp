@@ -182,3 +182,157 @@ export type ContenutoIntimo = {
   autore: string;
   createdAt: number;
 };
+
+// ---------------- Moduli M7 ----------------
+
+export type Pulizia = {
+  id: string;
+  householdId: string;
+  nome: string;
+  frequenza: "giornaliera" | "settimanale" | "mensile";
+  assegnatarioId?: string | null;
+  ultimoCompletamento?: number | null;
+  completataDa?: string | null;
+  createdAt: number;
+};
+
+export type VoceListaSpesa = {
+  id: string;
+  householdId: string;
+  nome: string;
+  preso: boolean;
+  presoDa?: string | null;
+  createdAt: number;
+};
+
+export type VoceSpesa = {
+  id: string;
+  householdId: string;
+  titolo: string;
+  importo: number;
+  categoria: "spesa" | "casa" | "salute" | "svago" | "altro";
+  data: number;
+  visibilita: VisibilitaContenuto;
+  relationshipId?: string;
+  autore: string;
+  createdAt: number;
+};
+
+export type Garanzia = {
+  id: string;
+  householdId: string;
+  nome: string;
+  scadenza: number;
+  note?: string;
+  createdAt: number;
+};
+
+export type Abbonamento = {
+  id: string;
+  householdId: string;
+  nome: string;
+  importo: number;
+  ciclo: "mensile" | "annuale";
+  prossimoRinnovo: number;
+  createdAt: number;
+};
+
+export type InterventoManutenzione = {
+  id: string;
+  householdId: string;
+  nome: string;
+  ricorrenzaMesi: number;
+  ultimaEsecuzione: number;
+  note?: string;
+  createdAt: number;
+};
+
+export type ContattoUtile = {
+  id: string;
+  householdId: string;
+  nome: string;
+  ruolo?: string;
+  telefono: string;
+  createdAt: number;
+};
+
+// ---------------- Moduli Premium ----------------
+
+export type ScadenzaEntita = {
+  tipo: string;          // es. "bollo", "vaccino" — dipende dal modulo
+  etichetta?: string;    // testo libero per tipo "altro"
+  data: number;          // timestamp ms
+};
+
+export type SpesaEntita = {
+  descrizione: string;
+  importo: number;
+  data: number;
+};
+
+export type Veicolo = {
+  id: string;
+  householdId: string;
+  nome: string;
+  tipo: "auto" | "moto" | "bici" | "altro";
+  targa?: string;
+  scadenze: ScadenzaEntita[];
+  spese: SpesaEntita[];
+  createdAt: number;
+};
+
+export type Animale = {
+  id: string;
+  householdId: string;
+  nome: string;
+  specie: "cane" | "gatto" | "altro";
+  scadenze: ScadenzaEntita[];
+  spese: SpesaEntita[];
+  createdAt: number;
+};
+
+export type Pianta = {
+  id: string;
+  householdId: string;
+  nome: string;
+  frequenzaGiorni: number;       // ogni quanti giorni annaffiare
+  ultimaAnnaffiatura: number;
+  note?: string;
+  createdAt: number;
+};
+
+// ---------------- Turni di lavoro ----------------
+// Visibili a tutta la casa (decisione di prodotto): servono a capire
+// "chi c'è" quando si programma qualcosa insieme.
+
+export type FasciaTurno =
+  | "mattina" | "pomeriggio" | "notte" | "libero" | "ferie" | "malattia";
+
+export type Turno = {
+  id: string;
+  householdId: string;
+  utenteId: string;          // di chi è il turno
+  giorno: number;            // timestamp ms normalizzato a mezzanotte
+  fascia: FasciaTurno;
+  oraInizio?: string;        // "06:00" — facoltativo
+  oraFine?: string;          // "14:00"
+  createdAt: number;
+};
+
+// ---------------- Salute ----------------
+// DATI SANITARI = categoria particolare (GDPR art. 9). Per scelta di
+// progetto sono PERSONALI: le Security Rules concedono lettura e scrittura
+// SOLO all'utente proprietario, nessun altro membro della casa può vederli.
+
+export type TipoVoceSalute = "controllo" | "farmaco" | "nota";
+
+export type VoceSalute = {
+  id: string;
+  utenteId: string;          // unico criterio di accesso
+  tipo: TipoVoceSalute;
+  titolo: string;            // "Pulizia denti", "Vitamina D", "Allergia polline"
+  prossimaData?: number;     // per i controlli
+  ricorrenzaMesi?: number;   // 6 = ogni sei mesi
+  note?: string;
+  createdAt: number;
+};

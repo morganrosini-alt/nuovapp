@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import { useHousehold } from "../hooks/useHousehold";
 import { ascoltaTipiRifiuto, eliminaTipoRifiuto, duplicaTipiPerAnno, coloreTestoLeggibile } from "../services/immondizia";
 import { TipoRifiutoPersonalizzato } from "../types";
+import { fonts } from "../theme";
 
 const GIORNO_BREVE: Record<string, string> = {
   lunedi: "Lun",
@@ -157,7 +158,7 @@ export default function ImmondiziaTipiScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF8F3" },
+  container: { flex: 1, backgroundColor: "#F5F8FA" },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -167,18 +168,18 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   headerButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   headerButtonPlaceholder: { width: 90 },
-  headerButtonText: { color: "#fff", fontSize: 14, fontWeight: "600" },
-  title: { fontSize: 18, fontWeight: "700", color: "#3A2E28" },
+  headerButtonText: { color: "#fff", fontSize: 14, fontFamily: fonts.semibold, fontWeight: "600" },
+  title: { fontSize: 18, fontFamily: fonts.bold, fontWeight: "700", color: "#2F4858" },
   annoSwitch: {
     flexDirection: "row",
     marginHorizontal: 20,
-    backgroundColor: "#F0E4D8",
+    backgroundColor: "#EEF2F5",
     borderRadius: 12,
     padding: 4,
     marginBottom: 14,
@@ -190,27 +191,27 @@ const styles = StyleSheet.create({
     borderRadius: 9,
   },
   annoButtonActive: { backgroundColor: "#fff" },
-  annoButtonText: { fontSize: 14, color: "#9A8A80", fontWeight: "600" },
-  annoButtonTextActive: { color: "#D97742" },
+  annoButtonText: { fontSize: 14, color: "#6C7A85", fontFamily: fonts.semibold, fontWeight: "600" },
+  annoButtonTextActive: { color: "#336699" },
   copiaCard: {
-    backgroundColor: "#FFF3E9",
+    backgroundColor: "#DCEBF3",
     borderRadius: 14,
     padding: 16,
     marginHorizontal: 20,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: "#F0C89A",
+    borderColor: "#86BBD8",
   },
-  copiaText: { fontSize: 13, color: "#7A6A60", lineHeight: 19, marginBottom: 12 },
+  copiaText: { fontSize: 13, color: "#6C7A85", lineHeight: 19, marginBottom: 12 },
   copiaButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingVertical: 11,
     alignItems: "center",
   },
-  copiaButtonText: { color: "#fff", fontSize: 13, fontWeight: "600" },
+  copiaButtonText: { color: "#fff", fontSize: 13, fontFamily: fonts.semibold, fontWeight: "600" },
   list: { paddingHorizontal: 20, paddingBottom: 100 },
-  emptyText: { textAlign: "center", color: "#9A8A80", fontSize: 13, lineHeight: 19, marginTop: 20 },
+  emptyText: { textAlign: "center", color: "#6C7A85", fontSize: 13, lineHeight: 19, marginTop: 20 },
   tipoCard: {
     backgroundColor: "#fff",
     borderRadius: 14,
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   letteraBadge: {
     width: 40,
@@ -229,12 +230,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 12,
     borderWidth: 0.75,
-    borderColor: "#3A2E28",
+    borderColor: "#2F4858",
   },
-  letteraBadgeText: { fontSize: 15, fontWeight: "700" },
-  tipoNome: { fontSize: 14, fontWeight: "600", color: "#3A2E28" },
-  tipoDettaglio: { fontSize: 12, color: "#9A8A80", marginTop: 3 },
-  eliminaText: { fontSize: 12, color: "#C0392B", fontWeight: "600", marginLeft: 8 },
+  letteraBadgeText: { fontSize: 15, fontFamily: fonts.bold, fontWeight: "700" },
+  tipoNome: { fontSize: 14, fontFamily: fonts.semibold, fontWeight: "600", color: "#2F4858" },
+  tipoDettaglio: { fontSize: 12, color: "#6C7A85", marginTop: 3 },
+  eliminaText: { fontSize: 12, color: "#D96A5B", fontFamily: fonts.semibold, fontWeight: "600", marginLeft: 8 },
   fab: {
     position: "absolute",
     bottom: 30,
@@ -242,14 +243,10 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
+    ...shadow.card,
   },
-  fabText: { fontSize: 28, color: "#fff", fontWeight: "400", marginTop: -2 },
+  fabText: { fontSize: 28, color: "#fff", fontFamily: fonts.regular, fontWeight: "400", marginTop: -2 },
 });

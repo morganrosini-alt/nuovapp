@@ -78,6 +78,21 @@ giustamente bloccato).
 - **GDPR**: dati in regione europea (eur3 / europe-west1), export dati
   gratuito in roadmap, cancellazione account con anonimizzazione.
 
+## Struttura di navigazione
+
+Quattro sezioni principali (tab bar), i moduli si aprono sopra come schermate:
+
+- **Home** — calendario unificato: eventi, scadenze bollette, raccolta
+  immondizia e turni di lavoro nello stesso mese; sotto, i promemoria della
+  bacheca condivisa.
+- **Finanze** — riepilogo uscite del mese + Bollette, Spese/rate, Salvadanai,
+  Abbonamenti, Statistiche.
+- **Utilità** — Turni, Pulizie, Lista spesa, Immondizia, Garanzie,
+  Manutenzione, Salute, Veicoli, Animali, Piante + Contatti utili,
+  Emergenze, Impostazioni.
+- **Coppia** — formazione della coppia, Zona Intima E2E, salvadanai ed
+  eventi condivisi solo tra i due partner.
+
 ## Struttura del repo
 
 ```
@@ -108,17 +123,38 @@ src/
 | Bacheca condivisa (note + checklist realtime) | ✅ Completo — M3 |
 | Coppia (richiesta/conferma + chiavi E2E) | ✅ Completo — M1 |
 | Push (infrastruttura + "nuovo membro") | ✅ Base attiva |
-| Notifiche locali scadenze | 🔜 M2 (helper già pronti in notifications.ts) |
-| Calendario condiviso | 🔜 M4 |
-| Portfolio spese + Salvadanai | 🔜 M5 |
-| Zona Intima (contenuti E2E) | 🔜 M6 (crypto pronta) |
-| Pulizie, Lista Spesa, Garanzie, Abbonamenti, Manutenzione, Contatti | 🔜 M7 (placeholder) |
-| Paywall + acquisti | 🔜 M8 (servizio purchases pronto, manca UI + dashboard RevenueCat) |
+| Notifiche locali scadenze (bollette, immondizia, garanzie, abbonamenti, manutenzione) | ✅ Completo — M2 |
+| Calendario condiviso (household/coppia/personale) | ✅ Completo — M4 |
+| Spese (categorie, visibilità, totali mensili) | ✅ Completo — M5 |
+| Salvadanai (obiettivi + contributi) | ✅ Completo — M5 |
+| Zona Intima (contenuti E2E) | ✅ Completo — M6 |
+| Pulizie, Lista Spesa, Garanzie, Abbonamenti, Manutenzione, Contatti | ✅ Completi — M7 |
+| Paywall + acquisti (RevenueCat) | ✅ UI pronta — manca solo la configurazione dashboard RevenueCat + prodotti store |
+| Moduli premium: Veicoli e Animali (scadenze+spese per entità), Piante (annaffiatura), Statistiche (grafici+condivisione) | ✅ Completi |
+| Navigazione a 4 tab + Home-calendario unificata | ✅ Completo |
+| Turni di lavoro (settimanale, visibili a tutta la casa, nel calendario) | ✅ Completo |
+| Salute (controlli ricorrenti, farmaci, note — **strettamente personali**) | ✅ Completo |
+| Migrazione UI completa ai design token + tema scuro | 🔁 Fase migliorie |
 
-## Nota UI
+## Palette e UI
 
-Le schermate storiche usano ancora la palette arancione originale; Bacheca e
-Coppia usano già i design token nuovi (`src/theme`: verde salvia su crema, dal
-redesign Claude Design). La migrazione completa delle schermate ai token è
-parte della fase di rifinitura UX — e renderà il futuro tema scuro un lavoro
-su un solo file.
+Palette "Baltic" (blu/verde) centralizzata in `src/theme`:
+Baltic Blue `#336699` accento · Charcoal Blue `#2F4858` testo ·
+Sky `#86BBD8` · verde `#9EE493` per stati positivi (mai come testo:
+contrasto insufficiente — per testo/spunte si usa `successInk` `#2E7D32`) ·
+corallo `#E0736E` riservato alla sezione Coppia, per marcare il cambio di
+contesto.
+
+Tutte le schermate leggono da questi token (le storiche sono state
+armonizzate automaticamente), quindi il tema scuro sarà un lavoro su un
+solo file. Restano da rifinire a mano alcune schermate legacy (bollette,
+immondizia, profilo) che usano ancora spaziature e componenti propri.
+
+## Privacy dei dati per modulo
+
+| Dato | Visibilità |
+|---|---|
+| Bollette, immondizia, pulizie, lista spesa, bacheca, turni… | Tutti i membri della casa |
+| Calendario, spese, salvadanai | Scelta per voce: casa / coppia / solo io |
+| Zona Intima | Solo i due partner — cifrata end-to-end |
+| **Salute** | **Solo il proprietario** — nessuno, nemmeno il partner |

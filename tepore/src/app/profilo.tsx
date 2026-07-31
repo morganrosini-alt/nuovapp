@@ -14,6 +14,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useHousehold } from "../hooks/useHousehold";
 import { getHouseholdsByIds, switchActiveHousehold } from "../services/household";
 import { Household } from "../types";
+import { fonts } from "../theme";
 
 export default function ProfiloScreen() {
   const { user, signOut } = useAuth();
@@ -87,7 +88,7 @@ export default function ProfiloScreen() {
       </TouchableOpacity>
 
       {isLoading ? (
-        <ActivityIndicator color="#D97742" style={{ marginTop: 20 }} />
+        <ActivityIndicator color="#336699" style={{ marginTop: 20 }} />
       ) : (
         <FlatList
           data={households}
@@ -110,7 +111,7 @@ export default function ProfiloScreen() {
                   </Text>
                 </View>
                 {switchingId === item.id ? (
-                  <ActivityIndicator color="#D97742" />
+                  <ActivityIndicator color="#336699" />
                 ) : isActive ? (
                   <Text style={styles.activeLabel}>✓ Attiva</Text>
                 ) : null}
@@ -130,7 +131,7 @@ export default function ProfiloScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   header: {
     flexDirection: "row",
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   backButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -162,12 +163,12 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   title: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   profileCard: {
     alignItems: "center",
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 10,
@@ -186,16 +187,16 @@ const styles = StyleSheet.create({
   avatarText: {
     color: "#fff",
     fontSize: 26,
-    fontWeight: "700",
+    fontFamily: fonts.bold, fontWeight: "700",
   },
   name: {
     fontSize: 19,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   email: {
     fontSize: 13,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginTop: 2,
   },
   sectionHeader: {
@@ -203,13 +204,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: "600",
-    color: "#3A2E28",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#2F4858",
     marginBottom: 12,
   },
   addHouseholdButton: {
     marginHorizontal: 20,
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 12,
     paddingVertical: 13,
     alignItems: "center",
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
   addHouseholdButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   leaveHouseholdButton: {
     marginHorizontal: 20,
@@ -228,12 +229,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#F0C0C0",
+    borderColor: "#F3C4BD",
   },
   leaveHouseholdButtonText: {
-    color: "#C0392B",
+    color: "#D96A5B",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   list: {
     flex: 1,
@@ -251,26 +252,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   householdCardActive: {
-    borderColor: "#D97742",
+    borderColor: "#336699",
     borderWidth: 2,
   },
   householdName: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#3A2E28",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#2F4858",
   },
   householdMembers: {
     fontSize: 12,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginTop: 2,
   },
   activeLabel: {
     fontSize: 12,
-    fontWeight: "700",
-    color: "#4A9D6E",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2E7D32",
   },
   signOutButton: {
     marginHorizontal: 20,
@@ -279,8 +280,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   signOutText: {
-    color: "#C0392B",
+    color: "#D96A5B",
     fontSize: 14,
-    fontWeight: "500",
+    fontFamily: fonts.medium, fontWeight: "500",
   },
 });

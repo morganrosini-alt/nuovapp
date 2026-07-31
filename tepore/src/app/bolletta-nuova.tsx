@@ -17,6 +17,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useHousehold } from "../hooks/useHousehold";
 import { creaBolletta, modificaBolletta, ascoltaBolletta } from "../services/bollette";
 import { TipoBolletta } from "../types";
+import { fonts } from "../theme";
 
 const TIPI: { key: TipoBolletta; label: string; emoji: string }[] = [
   { key: "acqua", label: "Acqua", emoji: "💧" },
@@ -112,7 +113,7 @@ export default function BollettaFormScreen() {
   if (isLoadingEsistente) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator color="#D97742" />
+        <ActivityIndicator color="#336699" />
       </View>
     );
   }
@@ -238,11 +239,11 @@ export default function BollettaFormScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   headerButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -265,12 +266,12 @@ const styles = StyleSheet.create({
   headerButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   title: {
     fontSize: 16,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   scroll: {
     flex: 1,
@@ -281,8 +282,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#7A6A60",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#6C7A85",
     marginBottom: 8,
     marginTop: 16,
   },
@@ -299,11 +300,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   tipoChipActive: {
-    backgroundColor: "#D97742",
-    borderColor: "#D97742",
+    backgroundColor: "#336699",
+    borderColor: "#336699",
   },
   tipoEmoji: {
     fontSize: 16,
@@ -311,8 +312,8 @@ const styles = StyleSheet.create({
   },
   tipoLabel: {
     fontSize: 13,
-    fontWeight: "500",
-    color: "#3A2E28",
+    fontFamily: fonts.medium, fontWeight: "500",
+    color: "#2F4858",
   },
   tipoLabelActive: {
     color: "#fff",
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   dateButton: {
     backgroundColor: "#fff",
@@ -332,11 +333,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   dateButtonText: {
     fontSize: 16,
-    color: "#3A2E28",
+    color: "#2F4858",
   },
   checkboxRow: {
     flexDirection: "row",
@@ -348,26 +349,26 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: "#D97742",
+    borderColor: "#336699",
     marginRight: 10,
     alignItems: "center",
     justifyContent: "center",
   },
   checkboxChecked: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
   },
   checkboxTick: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold, fontWeight: "700",
   },
   checkboxLabel: {
     fontSize: 14,
-    color: "#3A2E28",
+    color: "#2F4858",
     flex: 1,
   },
   errorText: {
-    color: "#C0392B",
+    color: "#D96A5B",
     fontSize: 13,
     marginTop: 16,
     textAlign: "center",

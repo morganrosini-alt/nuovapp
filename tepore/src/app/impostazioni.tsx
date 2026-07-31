@@ -16,6 +16,7 @@ import { router } from "expo-router";
 import { useAuth } from "../hooks/useAuth";
 import { useHousehold } from "../hooks/useHousehold";
 import { updateDisplayName } from "../services/household";
+import { fonts } from "../theme";
 
 export default function ImpostazioniScreen() {
   const { user } = useAuth();
@@ -113,7 +114,7 @@ export default function ImpostazioniScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   header: {
     flexDirection: "row",
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   backButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -135,25 +136,25 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   title: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   content: {
     paddingHorizontal: 20,
   },
   sectionLabel: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#7A6A60",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#6C7A85",
     marginBottom: 4,
   },
   helperText: {
     fontSize: 12,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginBottom: 12,
     lineHeight: 17,
   },
@@ -169,10 +170,10 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   saveNameButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 12,
     paddingHorizontal: 18,
     justifyContent: "center",
@@ -182,11 +183,11 @@ const styles = StyleSheet.create({
   saveNameButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   divider: {
     height: 1,
-    backgroundColor: "#EEE0D5",
+    backgroundColor: "#E2E9EE",
     marginVertical: 20,
   },
   settingRow: {
@@ -197,23 +198,23 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   settingRowLabel: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#3A2E28",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#2F4858",
   },
   settingRowValue: {
     fontSize: 12,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginTop: 2,
   },
   comingSoonBadge: {
     fontSize: 11,
-    fontWeight: "700",
-    color: "#D97742",
-    backgroundColor: "#FFE8D6",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#336699",
+    backgroundColor: "#DCEBF3",
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,

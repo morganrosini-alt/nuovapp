@@ -30,6 +30,7 @@ import {
   coloreTestoLeggibile,
 } from "../services/immondizia";
 import { AssegnazioneGiorno, FrequenzaRaccolta, GiornoSettimana, TipoRifiutoPersonalizzato } from "../types";
+import { fonts } from "../theme";
 
 const GIORNI: { key: GiornoSettimana; label: string }[] = [
   { key: "lunedi", label: "Lunedì" },
@@ -153,7 +154,7 @@ export default function ImmondiziaTipoFormScreen() {
   if (isLoadingEsistente) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator color="#D97742" />
+        <ActivityIndicator color="#336699" />
       </View>
     );
   }
@@ -354,8 +355,8 @@ export default function ImmondiziaTipoFormScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF8F3" },
-  loadingContainer: { flex: 1, backgroundColor: "#FFF8F3", justifyContent: "center", alignItems: "center" },
+  container: { flex: 1, backgroundColor: "#F5F8FA" },
+  loadingContainer: { flex: 1, backgroundColor: "#F5F8FA", justifyContent: "center", alignItems: "center" },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -365,19 +366,19 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   headerButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 8,
     minWidth: 70,
     alignItems: "center",
   },
-  headerButtonText: { color: "#fff", fontSize: 14, fontWeight: "600" },
-  title: { fontSize: 15, fontWeight: "700", color: "#3A2E28" },
+  headerButtonText: { color: "#fff", fontSize: 14, fontFamily: fonts.semibold, fontWeight: "600" },
+  title: { fontSize: 15, fontFamily: fonts.bold, fontWeight: "700", color: "#2F4858" },
   scroll: { flex: 1 },
   content: { paddingHorizontal: 20, paddingBottom: 60 },
-  label: { fontSize: 13, fontWeight: "600", color: "#7A6A60", marginBottom: 8, marginTop: 16 },
-  helperText: { fontSize: 12, color: "#9A8A80", marginBottom: 10, marginTop: 10, lineHeight: 17 },
+  label: { fontSize: 13, fontFamily: fonts.semibold, fontWeight: "600", color: "#6C7A85", marginBottom: 8, marginTop: 16 },
+  helperText: { fontSize: 12, color: "#6C7A85", marginBottom: 10, marginTop: 10, lineHeight: 17 },
   input: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -385,7 +386,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   inputSigla: { width: 100 },
   coloriGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 14, marginBottom: 12 },
@@ -396,21 +397,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1.5,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   colorSwatchSelected: {
-    borderColor: "#3A2E28",
+    borderColor: "#2F4858",
     borderWidth: 3,
   },
   colorSwatchBiancoBordo: {
-    borderColor: "#3A2E28",
+    borderColor: "#2F4858",
     borderWidth: 1.5,
   },
   colorSwatchCheck: {
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold, fontWeight: "700",
   },
-  nessunGiornoText: { fontSize: 13, color: "#9A8A80", fontStyle: "italic" },
+  nessunGiornoText: { fontSize: 13, color: "#6C7A85", fontStyle: "italic" },
   assegnazioneRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -420,18 +421,18 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
-  assegnazioneGiorno: { fontSize: 14, fontWeight: "600", color: "#3A2E28" },
-  assegnazioneFrequenza: { fontSize: 12, color: "#9A8A80", marginTop: 2 },
-  rimuoviText: { fontSize: 12, color: "#C0392B", fontWeight: "600" },
+  assegnazioneGiorno: { fontSize: 14, fontFamily: fonts.semibold, fontWeight: "600", color: "#2F4858" },
+  assegnazioneFrequenza: { fontSize: 12, color: "#6C7A85", marginTop: 2 },
+  rimuoviText: { fontSize: 12, color: "#D96A5B", fontFamily: fonts.semibold, fontWeight: "600" },
   nuovaAssegnazioneCard: {
-    backgroundColor: "#F5EDE4",
+    backgroundColor: "#EEF2F5",
     borderRadius: 14,
     padding: 16,
     marginTop: 12,
   },
-  nuovaAssegnazioneTitle: { fontSize: 13, fontWeight: "600", color: "#7A6A60", marginBottom: 10 },
+  nuovaAssegnazioneTitle: { fontSize: 13, fontFamily: fonts.semibold, fontWeight: "600", color: "#6C7A85", marginBottom: 10 },
   giorniGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   giornoChip: {
     paddingHorizontal: 12,
@@ -439,10 +440,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
-  giornoChipActive: { backgroundColor: "#D97742", borderColor: "#D97742" },
-  giornoChipText: { fontSize: 13, fontWeight: "500", color: "#3A2E28" },
+  giornoChipActive: { backgroundColor: "#336699", borderColor: "#336699" },
+  giornoChipText: { fontSize: 13, fontFamily: fonts.medium, fontWeight: "500", color: "#2F4858" },
   giornoChipTextActive: { color: "#fff" },
   frequenzaRow: { flexDirection: "row", gap: 8, marginTop: 12 },
   frequenzaButton: {
@@ -452,10 +453,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
-  frequenzaButtonActive: { backgroundColor: "#D97742", borderColor: "#D97742" },
-  frequenzaText: { fontSize: 12, fontWeight: "600", color: "#3A2E28" },
+  frequenzaButtonActive: { backgroundColor: "#336699", borderColor: "#336699" },
+  frequenzaText: { fontSize: 12, fontFamily: fonts.semibold, fontWeight: "600", color: "#2F4858" },
   frequenzaTextActive: { color: "#fff" },
   dateButton: {
     backgroundColor: "#fff",
@@ -463,7 +464,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   datePickerIosRow: {
     backgroundColor: "#fff",
@@ -471,17 +472,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
     alignItems: "flex-start",
   },
-  dateButtonText: { fontSize: 15, color: "#3A2E28" },
+  dateButtonText: { fontSize: 15, color: "#2F4858" },
   confermaButton: {
-    backgroundColor: "#3A2E28",
+    backgroundColor: "#2F4858",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center",
     marginTop: 12,
   },
-  confermaButtonText: { color: "#fff", fontSize: 13, fontWeight: "600" },
-  errorText: { color: "#C0392B", fontSize: 13, marginTop: 16, textAlign: "center" },
+  confermaButtonText: { color: "#fff", fontSize: 13, fontFamily: fonts.semibold, fontWeight: "600" },
+  errorText: { color: "#D96A5B", fontSize: 13, marginTop: 16, textAlign: "center" },
 });

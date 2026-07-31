@@ -13,6 +13,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useHousehold } from "../hooks/useHousehold";
 import { ascoltaBollette } from "../services/bollette";
 import { Bolletta, TipoBolletta } from "../types";
+import { fonts } from "../theme";
 
 const TIPO_INFO: Record<TipoBolletta, { label: string; emoji: string }> = {
   acqua: { label: "Acqua", emoji: "💧" },
@@ -109,7 +110,7 @@ export default function BolletteScreen() {
       )}
 
       {isLoading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color="#D97742" />
+        <ActivityIndicator style={{ marginTop: 40 }} color="#336699" />
       ) : (
         <FlatList
           data={bolletteFiltrate}
@@ -181,7 +182,7 @@ function capitalizza(testo: string): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   header: {
     flexDirection: "row",
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   homeButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -203,17 +204,17 @@ const styles = StyleSheet.create({
   homeButtonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   title: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   tabSwitch: {
     flexDirection: "row",
     marginHorizontal: 20,
-    backgroundColor: "#F0E4D8",
+    backgroundColor: "#EEF2F5",
     borderRadius: 12,
     padding: 4,
     marginBottom: 12,
@@ -229,11 +230,11 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 14,
-    color: "#9A8A80",
-    fontWeight: "600",
+    color: "#6C7A85",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   tabTextActive: {
-    color: "#D97742",
+    color: "#336699",
   },
   filterRow: {
     maxHeight: 44,
@@ -253,16 +254,16 @@ const styles = StyleSheet.create({
     height: 36,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   filterChipActive: {
-    backgroundColor: "#D97742",
-    borderColor: "#D97742",
+    backgroundColor: "#336699",
+    borderColor: "#336699",
   },
   filterChipText: {
     fontSize: 13,
-    color: "#3A2E28",
-    fontWeight: "500",
+    color: "#2F4858",
+    fontFamily: fonts.medium, fontWeight: "500",
     lineHeight: 16,
     includeFontPadding: false,
     textAlignVertical: "center",
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     textAlign: "center",
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginTop: 40,
     fontSize: 14,
   },
@@ -289,7 +290,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   cardLeft: {
     flexDirection: "row",
@@ -302,26 +303,26 @@ const styles = StyleSheet.create({
   },
   cardNome: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#3A2E28",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#2F4858",
   },
   cardData: {
     fontSize: 12,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginTop: 2,
   },
   cardDataScaduta: {
-    color: "#C0392B",
-    fontWeight: "700",
+    color: "#D96A5B",
+    fontFamily: fonts.bold, fontWeight: "700",
   },
   cardDataPagata: {
-    color: "#4A9D6E",
-    fontWeight: "700",
+    color: "#2E7D32",
+    fontFamily: fonts.bold, fontWeight: "700",
   },
   cardImporto: {
     fontSize: 15,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   fab: {
     position: "absolute",
@@ -330,19 +331,15 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
+    ...shadow.card,
   },
   fabText: {
     fontSize: 28,
     color: "#fff",
-    fontWeight: "400",
+    fontFamily: fonts.regular, fontWeight: "400",
     marginTop: -2,
   },
 });

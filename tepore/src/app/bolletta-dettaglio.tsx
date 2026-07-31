@@ -10,6 +10,7 @@ import {
   segnaBollettaNonPagata,
 } from "../services/bollette";
 import { Bolletta, TipoBolletta } from "../types";
+import { fonts } from "../theme";
 
 const TIPO_INFO: Record<TipoBolletta, { label: string; emoji: string }> = {
   acqua: { label: "Acqua", emoji: "💧" },
@@ -115,7 +116,7 @@ export default function BollettaDettaglioScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator color="#D97742" />
+        <ActivityIndicator color="#336699" />
       </View>
     );
   }
@@ -192,7 +193,7 @@ export default function BollettaDettaglioScreen() {
             disabled={isTogglingPagata}
           >
             {isTogglingPagata ? (
-              <ActivityIndicator color="#C0392B" />
+              <ActivityIndicator color="#D96A5B" />
             ) : (
               <Text style={styles.toglipagataButtonText}>↩ Togli il pagato</Text>
             )}
@@ -225,7 +226,7 @@ export default function BollettaDettaglioScreen() {
             disabled={isDeleting}
           >
             {isDeleting ? (
-              <ActivityIndicator color="#C0392B" />
+              <ActivityIndicator color="#D96A5B" />
             ) : (
               <Text style={styles.deleteButtonText}>Elimina</Text>
             )}
@@ -247,21 +248,21 @@ function formatDataCompleta(timestamp: number): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#FFF8F3",
+    backgroundColor: "#F5F8FA",
     justifyContent: "center",
     alignItems: "center",
     gap: 12,
   },
   notFoundText: {
     fontSize: 15,
-    color: "#9A8A80",
+    color: "#6C7A85",
   },
   backLink: {
-    color: "#D97742",
+    color: "#336699",
     fontSize: 14,
   },
   header: {
@@ -273,7 +274,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   backButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -284,12 +285,12 @@ const styles = StyleSheet.create({
   backText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   title: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
   },
   content: {
     alignItems: "center",
@@ -305,20 +306,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
   },
   emoji: {
     fontSize: 34,
   },
   nome: {
     fontSize: 20,
-    fontWeight: "700",
-    color: "#3A2E28",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2F4858",
     textAlign: "center",
   },
   tipoLabel: {
     fontSize: 13,
-    color: "#9A8A80",
+    color: "#6C7A85",
     marginTop: 4,
     marginBottom: 12,
   },
@@ -332,12 +333,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#D4EDD4",
   },
   statusBadgeDaPagare: {
-    backgroundColor: "#FFE8D6",
+    backgroundColor: "#DCEBF3",
   },
   statusBadgeText: {
     fontSize: 12,
-    fontWeight: "600",
-    color: "#3A2E28",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#2F4858",
   },
   detailsCard: {
     width: "100%",
@@ -345,7 +346,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 18,
     borderWidth: 1,
-    borderColor: "#EEE0D5",
+    borderColor: "#E2E9EE",
     marginBottom: 20,
   },
   detailRow: {
@@ -355,25 +356,25 @@ const styles = StyleSheet.create({
   },
   detailDivider: {
     height: 1,
-    backgroundColor: "#F5EDE4",
+    backgroundColor: "#EEF2F5",
   },
   detailLabel: {
     fontSize: 14,
-    color: "#9A8A80",
+    color: "#6C7A85",
   },
   detailValue: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#3A2E28",
+    fontFamily: fonts.semibold, fontWeight: "600",
+    color: "#2F4858",
   },
   detailValuePagata: {
     fontSize: 14,
-    fontWeight: "700",
-    color: "#4A9D6E",
+    fontFamily: fonts.bold, fontWeight: "700",
+    color: "#2E7D32",
   },
   segnapagataButton: {
     width: "100%",
-    backgroundColor: "#4A9D6E",
+    backgroundColor: "#2E7D32",
     borderRadius: 12,
     paddingVertical: 15,
     alignItems: "center",
@@ -382,7 +383,7 @@ const styles = StyleSheet.create({
   segnapagataButtonText: {
     color: "#fff",
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   toglipagataButton: {
     width: "100%",
@@ -392,19 +393,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#F0C0C0",
+    borderColor: "#F3C4BD",
   },
   toglipagataButtonText: {
-    color: "#C0392B",
+    color: "#D96A5B",
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   actions: {
     width: "100%",
     gap: 10,
   },
   editButton: {
-    backgroundColor: "#D97742",
+    backgroundColor: "#336699",
     borderRadius: 12,
     paddingVertical: 15,
     alignItems: "center",
@@ -412,7 +413,7 @@ const styles = StyleSheet.create({
   editButtonText: {
     color: "#fff",
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
   deleteButton: {
     backgroundColor: "#fff",
@@ -420,11 +421,11 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#F0C0C0",
+    borderColor: "#F3C4BD",
   },
   deleteButtonText: {
-    color: "#C0392B",
+    color: "#D96A5B",
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.semibold, fontWeight: "600",
   },
 });
