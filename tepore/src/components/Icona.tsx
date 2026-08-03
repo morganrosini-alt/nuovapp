@@ -35,6 +35,9 @@ const MAPPA: Record<string, keyof typeof Ph> = {
   "share-variant-outline": "ShareNetwork",
   "content-copy": "Copy",
   "dots-horizontal": "DotsThree",
+  "close": "X",
+  "checkmark": "Check",
+  "copy-outline": "Copy",
   "cog-outline": "GearSix",
   "lock-outline": "Lock",
   "lock-check-outline": "LockKey",
@@ -139,9 +142,30 @@ type Props = {
   style?: any;
 };
 
+// Phosphor espone ogni icona due volte: col nome storico ("Car") e col nome
+// nuovo ("CarIcon"). Non tutte le versioni hanno entrambi — nella 3.0.6, per
+// esempio, "Circle" NON esiste mentre "CircleIcon" sì. Proviamo entrambe le
+// forme prima di arrenderci.
+function risolviIcona(nomePh: string | undefined) {
+  if (!nomePh) return undefined;
+  return (Ph as any)[nomePh] ?? (Ph as any)[nomePh + "Icon"];
+}
+
 export default function Icona({ name, size = 20, color = "#2F4858", weight, style }: Props) {
-  const nomePh = MAPPA[name] ?? "Circle";
-  const Componente = (Ph as any)[nomePh] ?? (Ph as any).Circle;
+  // ⚠️ CORRETTO (01/08): qui c'era il crash "Element type is invalid".
+  // Un nome non presente in MAPPA ripiegava su "Circle", che in questa
+  // versione di Phosphor non esiste: React riceveva `undefined` come
+  // componente e l'app moriva. Succedeva aprendo il composer di Veicoli,
+  // Animali, Piante, Spese, Pulizie e altri, perché il bottone "+" diventa
+  // "close" — un nome che non era mappato.
+  const Componente = risolviIcona(MAPPA[name]) ?? risolviIcona("Circle");
+
+  // Ultima difesa: meglio uno spazio vuoto che un'app che si chiude.
+  if (!Componente) {
+    if (__DEV__) console.warn(`[Icona] nessuna icona per "${name}"`);
+    return null;
+  }
+
   const peso = weight ?? (size >= SOGLIA_DUOTONE ? "duotone" : "regular");
   return <Componente size={size} color={color} weight={peso} style={style} />;
 }

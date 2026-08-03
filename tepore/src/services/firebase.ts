@@ -12,7 +12,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 // senza questa riga TypeScript segnalerebbe un errore inesistente.
 // @ts-expect-error - export presente solo nella build RN di firebase/auth
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -47,7 +47,18 @@ export const auth = initializeAuth(app, {
 });
 
 // Firestore: il database condiviso della household (bollette, scadenze, ecc.)
-export const db = getFirestore(app);
+//
+// ⚠️ ignoreUndefinedProperties (01/08): senza questa opzione, scrivere un
+// campo con valore `undefined` fa lanciare un errore a Firestore
+// ("Unsupported field value: undefined") e la creazione fallisce.
+// Succedeva davvero in tre punti: un contatto salvato senza ruolo, una voce
+// di salute senza note, e la spunta di un elemento della bacheca. Con questa
+// opzione i campi non valorizzati vengono semplicemente omessi dal documento,
+// che è il comportamento atteso, e la cosa non può più ripresentarsi in
+// futuro su un campo opzionale nuovo.
+export const db = initializeFirestore(app, {
+  ignoreUndefinedProperties: true,
+});
 
 // Storage: per allegati come PDF bollette, foto scontrini, foto libretto veicolo.
 export const storage = getStorage(app);

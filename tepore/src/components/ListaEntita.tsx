@@ -2,7 +2,7 @@
 // Lista generica delle entità (veicoli o animali): nome + prossima scadenza,
 // composer per aggiungerne, tap → dettaglio.
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View, Text, TextInput, TouchableOpacity, FlatList,
   StyleSheet, KeyboardAvoidingView, Platform,
@@ -37,7 +37,10 @@ export default function ListaEntita({
 }: Props) {
   const { profile } = useHousehold();
   const householdId = profile?.householdId ?? null;
-  const servizio = creaServizio<EntitaBase>(collezione);
+  // useMemo: senza, ogni render creerebbe un servizio nuovo. Oggi non fa
+  // danni perché l'effetto dipende solo da householdId, ma è una trappola
+  // pronta a scattare al primo che aggiunge `servizio` alle dipendenze.
+  const servizio = useMemo(() => creaServizio<EntitaBase>(collezione), [collezione]);
 
   const [entita, setEntita] = useState<EntitaBase[]>([]);
   const [composerAperto, setComposerAperto] = useState(false);
