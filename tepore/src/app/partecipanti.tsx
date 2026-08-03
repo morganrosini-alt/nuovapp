@@ -90,7 +90,7 @@ export default function PartecipantiScreen() {
       ) : (
         <FlatList
           data={membri}
-          keyExtractor={(item) => item.uid}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <View style={styles.memberCard}>
@@ -102,11 +102,11 @@ export default function PartecipantiScreen() {
               <View style={styles.memberInfo}>
                 <Text style={styles.memberName}>
                   {item.displayName}
-                  {item.uid === user?.uid ? " (tu)" : ""}
+                  {item.id === user?.uid ? " (tu)" : ""}
                 </Text>
                 <Text style={styles.memberEmail}>{item.email}</Text>
               </View>
-              {household?.ownerId === item.uid && (
+              {household?.ownerId === item.id && (
                 <View style={styles.ownerBadge}>
                   <Text style={styles.ownerBadgeText}>Proprietario</Text>
                 </View>

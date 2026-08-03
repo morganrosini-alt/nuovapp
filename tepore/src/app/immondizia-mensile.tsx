@@ -97,7 +97,7 @@ export default function ImmondiziaMensileScreen() {
     return () => clearTimeout(timer);
   }, [indiceOggi]);
 
-  function getItemLayout(_data: Riga[] | null | undefined, index: number) {
+  function getItemLayout(_data: ArrayLike<Riga> | null | undefined, index: number) {
     const length = righe[index]?.tipo === "separatore" ? ALTEZZA_SEPARATORE : ALTEZZA_GIORNO;
     return { length, offset: calcolaOffset(index), index };
   }

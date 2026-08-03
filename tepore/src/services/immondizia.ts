@@ -21,6 +21,19 @@ import {
 const TIPI_COLLECTION = "immondizia_tipi";
 const STRAORDINARIE_COLLECTION = "immondizia_straordinarie";
 
+// Giorni nell'ordine restituito da Date.getDay() (0 = domenica).
+// Unico punto di conversione data -> giorno: prima ogni schermata aveva la
+// propria copia di questa tabella e tre chiamanti passavano direttamente il
+// numero, che non combaciava mai con le stringhe salvate su Firestore.
+export const GIORNI_DA_INDICE_JS: GiornoSettimana[] = [
+  "domenica", "lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato",
+];
+
+/** Giorno della settimana di una data, nella forma salvata su Firestore. */
+export function giornoDaData(data: Date): GiornoSettimana {
+  return GIORNI_DA_INDICE_JS[data.getDay()];
+}
+
 export const PALETTE_COLORI = [
   "#3B7DD8", "#E0B400", "#4A9D6E", "#D97742",
   "#8B5E3C", "#9B59B6", "#16A085", "#C0392B",
@@ -118,6 +131,13 @@ export async function duplicaTipiPerAnno(
 // un numero pari.
 function assegnazioneAttivaInData(assegnazione: AssegnazioneGiorno, data: Date): boolean {
   if (assegnazione.frequenza === "ogni-settimana") return true;
+
+  // Senza data di riferimento non possiamo sapere QUALE delle due settimane
+  // è quella buona. Prima new Date(undefined) produceva una data non valida,
+  // ogni confronto dava NaN e la raccolta spariva in silenzio dal calendario.
+  // Meglio mostrarla tutte le settimane: un promemoria di troppo è un
+  // fastidio, un promemoria mancato è un bidone non portato fuori.
+  if (assegnazione.dataRiferimento == null) return true;
 
   const riferimento = new Date(assegnazione.dataRiferimento);
   const dataNorm = new Date(data.getFullYear(), data.getMonth(), data.getDate()).getTime();

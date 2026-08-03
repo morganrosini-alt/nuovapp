@@ -6,6 +6,11 @@
 // invece di re-inizializzare Firebase più volte.
 
 import { initializeApp, getApps, getApp } from "firebase/app";
+// getReactNativePersistence esiste nella build React Native di firebase/auth
+// (la stessa che Metro risolve a runtime), ma NON nei tipi pubblici del
+// pacchetto, che descrivono la build web. L'import è corretto e funziona:
+// senza questa riga TypeScript segnalerebbe un errore inesistente.
+// @ts-expect-error - export presente solo nella build RN di firebase/auth
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";

@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import Icona from "../components/Icona";
 import { useAuth } from "../hooks/useAuth";
-import { fonts } from "../theme";
+import { fonts, colors } from "../theme";
 
 export default function LoginScreen() {
   const { signIn, signUp, signInWithGoogle, signInWithApple, signInWithFacebook } =
@@ -333,4 +333,20 @@ const styles = StyleSheet.create({
   facebookButtonText: {
     color: "#fff",
   },
+  // ⚠️ AGGIUNTI (31/07): erano referenziati dal bottone "Non hai un account?
+  // Registrati" ma non definiti. React Native ignora uno stile undefined
+  // senza errori, quindi il link appariva minuscolo e attaccato al bottone
+  // sopra: un bug invisibile ai controlli automatici, evidente all'uso.
+  switchModeButton: {
+    marginTop: 20,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  switchModeText: {
+    fontSize: 15,
+    fontFamily: fonts.semibold,
+    color: colors.accent,
+    textAlign: "center",
+  },
+
 });

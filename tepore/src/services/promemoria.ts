@@ -21,7 +21,7 @@
 import * as Notifications from "expo-notifications";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "./firebase";
-import { lettereAttiveInGiorno } from "./immondizia";
+import { lettereAttiveInGiorno, giornoDaData } from "./immondizia";
 import {
   Abbonamento, Animale, Bolletta, Garanzia, GiornoSettimana,
   InterventoManutenzione, Pianta, RaccoltaStraordinaria,
@@ -112,7 +112,7 @@ export async function sincronizzaPromemoria(
       giornoRaccolta.setHours(12, 0, 0, 0);
       const attivi = lettereAttiveInGiorno(
         tipi,
-        giornoRaccolta.getDay() as GiornoSettimana,
+        giornoDaData(giornoRaccolta),
         giornoRaccolta
       );
       if (attivi.length === 0) continue;

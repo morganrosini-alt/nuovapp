@@ -54,9 +54,17 @@ export type Bolletta = {
 
 // ---------------- Immondizia ----------------
 
-export type GiornoSettimana = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = domenica (Date.getDay())
+// ⚠️ CORRETTO (31/07): questo tipo dichiarava numeri 0-6, ma il form salva su
+// Firestore i nomi dei giorni ("lunedi", ...) e il servizio li confronta come
+// stringhe. Il tipo era l'unico pezzo rimasto sull'altra convenzione, e questo
+// nascondeva un bug reale: dashboard, Utilità e promemoria passavano
+// getDay() (un numero) e il confronto `a.giorno === giorno` era sempre falso,
+// quindi la raccolta di oggi non compariva mai. Ora la convenzione è una sola.
+export type GiornoSettimana =
+  | "domenica" | "lunedi" | "martedi" | "mercoledi"
+  | "giovedi" | "venerdi" | "sabato";
 
-export type FrequenzaRaccolta = "settimanale" | "quindicinale";
+export type FrequenzaRaccolta = "ogni-settimana" | "ogni-2-settimane";
 
 export type AssegnazioneGiorno = {
   giorno: GiornoSettimana;

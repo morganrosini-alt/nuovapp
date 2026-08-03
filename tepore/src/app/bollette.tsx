@@ -13,7 +13,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useHousehold } from "../hooks/useHousehold";
 import { ascoltaBollette } from "../services/bollette";
 import { Bolletta, TipoBolletta } from "../types";
-import { fonts } from "../theme";
+import { fonts, shadow } from "../theme";
 
 const TIPO_INFO: Record<TipoBolletta, { label: string; emoji: string }> = {
   acqua: { label: "Acqua", emoji: "💧" },

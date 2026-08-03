@@ -13,6 +13,7 @@
 // I risultati vengono fusi e riconsegnati come lista unica.
 
 import { collection, onSnapshot, query, where } from "firebase/firestore";
+import type { Query, DocumentData } from "firebase/firestore";
 import { db } from "./firebase";
 
 export function ascoltaContenutiScoped<T extends { id: string }>(
@@ -35,7 +36,9 @@ export function ascoltaContenutiScoped<T extends { id: string }>(
   const base = collection(db, nomeCollezione);
   const listeners: Array<() => void> = [];
 
-  const attacca = (chiave: string, q: ReturnType<typeof query>) => {
+  // Query<DocumentData>: senza il parametro di tipo, d.data() risulta di tipo
+  // sconosciuto e lo spread qui sotto non compila.
+  const attacca = (chiave: string, q: Query<DocumentData>) => {
     listeners.push(
       onSnapshot(
         q,

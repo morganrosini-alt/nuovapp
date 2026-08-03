@@ -12,7 +12,7 @@ import { db } from "../../services/firebase";
 import { useAuth } from "../../hooks/useAuth";
 import { useHousehold } from "../../hooks/useHousehold";
 import { usePremium } from "../../hooks/usePremium";
-import { lettereAttiveInGiorno } from "../../services/immondizia";
+import { lettereAttiveInGiorno, giornoDaData } from "../../services/immondizia";
 import { ascoltaTurni, turniDelGiorno, fascia } from "../../services/turni";
 import {
   Garanzia, GiornoSettimana, Pianta, Pulizia, TipoRifiutoPersonalizzato,
@@ -65,7 +65,7 @@ export default function UtilitaScreen() {
     (p) => !p.ultimoCompletamento || Date.now() - p.ultimoCompletamento > PERIODI[p.frequenza]
   ).length;
   const daPrendere = lista.filter((v) => !v.preso).length;
-  const oggiRifiuti = lettereAttiveInGiorno(tipiRifiuto, new Date().getDay() as GiornoSettimana, new Date());
+  const oggiRifiuti = lettereAttiveInGiorno(tipiRifiuto, giornoDaData(new Date()), new Date());
   const garanziaProssima = [...garanzie].sort((a, b) => a.scadenza - b.scadenza)[0];
   const pianteAssetate = piante.filter(
     (p) => p.ultimaAnnaffiatura + p.frequenzaGiorni * GIORNO <= Date.now()

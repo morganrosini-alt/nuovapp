@@ -39,8 +39,11 @@ export async function createUserProfile(
   displayName?: string
 ): Promise<void> {
   const userRef = doc(db, "users", uid);
-  const profile: UserProfile = {
-    uid,
+  // Nota: l'identificatore NON viene salvato come campo. Il documento si
+  // chiama già come l'uid, e getUserProfile lo rilegge da lì: così non
+  // possono più esistere due convenzioni diverse ("id" nel tipo, "uid" nei
+  // dati) che si contraddicono a vicenda.
+  const profile: Omit<UserProfile, "id"> = {
     email,
     displayName: displayName?.trim() || email.split("@")[0],
     householdId: null,
@@ -53,7 +56,9 @@ export async function createUserProfile(
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   const userRef = doc(db, "users", uid);
   const snapshot = await getDoc(userRef);
-  return snapshot.exists() ? (snapshot.data() as UserProfile) : null;
+  return snapshot.exists()
+    ? ({ id: snapshot.id, ...snapshot.data() } as UserProfile)
+    : null;
 }
 
 // Crea una nuova household. La rende SUBITO la "casa attiva" dell'utente

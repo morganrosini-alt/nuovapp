@@ -20,7 +20,7 @@ import { getHousehold, getUserProfilesByIds } from "../../services/household";
 import { ascoltaBacheca, toggleChecklistItem } from "../../services/bacheca";
 import { ascoltaContenutiScoped } from "../../services/scoped";
 import { ascoltaRelazioniCasa, miaRelazione } from "../../services/relationships";
-import { lettereAttiveInGiorno, coloreTestoLeggibile } from "../../services/immondizia";
+import { lettereAttiveInGiorno, coloreTestoLeggibile, giornoDaData } from "../../services/immondizia";
 import { ascoltaTurni, turniDelGiorno, fascia, aMezzanotte } from "../../services/turni";
 import {
   Bolletta, EventoCalendario, GiornoSettimana, NotaBacheca, Relationship,
@@ -113,7 +113,7 @@ export default function HomeScreen() {
     const chiave = aMezzanotte(data);
     const ev = eventi.filter((e) => aMezzanotte(e.inizio) === chiave);
     const sc = bollette.filter((b) => aMezzanotte(b.dataScadenza) === chiave);
-    const rif = lettereAttiveInGiorno(tipiRifiuto, data.getDay() as GiornoSettimana, data);
+    const rif = lettereAttiveInGiorno(tipiRifiuto, giornoDaData(data), data);
     const tur = turniDelGiorno(turni, data);
     return { ev, sc, rif, tur };
   }

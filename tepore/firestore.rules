@@ -1,95 +1,162 @@
 rules_version = '2';
 
-// TEPORE — Regole di sicurezza Firestore
-// Da incollare in: Firebase Console -> Firestore Database -> Regole -> Pubblica
+// TEPORE — Regole di sicurezza Firestore  ·  progetto housekeep-9b194
 //
-// Principio: solo utenti autenticati, e ogni documento dati e' leggibile o
-// scrivibile solo da chi e' membro della casa (household) a cui appartiene.
-// Sostituisce le regole "modalita' test", che SCADONO dopo 30 giorni e ti
-// spegnerebbero l'app a meta' agosto.
+// Da pubblicare in: Firebase Console -> Firestore Database -> Regole.
+//
+// ⚠️ RISCRITTE (31/07): la versione precedente copriva 6 collezioni su 22.
+// Tutto il resto (spese, turni, calendario, piante, veicoli, salute...)
+// finiva nel "vietato per default", ed era la causa dell'errore
+// "Missing or insufficient permissions" visto all'apertura dell'app.
+//
+// Tre livelli di accesso:
+//   1. household  -> tutti i membri della casa
+//   2. personale  -> solo l'autore
+//   3. coppia     -> solo i due membri della relazione
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ---------- funzioni di supporto ----------
+    // ---------------- funzioni di supporto ----------------
 
     function autenticato() {
       return request.auth != null;
     }
 
-    // E' membro della casa indicata? Legge memberIds dal documento household.
-    // Firestore mette in cache questa get() dentro la stessa valutazione,
-    // quindi anche su una query di 100 bollette conta come una lettura sola.
+    function mioUid() {
+      return request.auth.uid;
+    }
+
+    // Membro della casa? Le get() dentro le regole sono messe in cache per
+    // valutazione, quindi una query su 100 documenti costa una lettura sola.
     function membroDi(householdId) {
       return autenticato()
-        && request.auth.uid in
-           get(/databases/$(database)/documents/households/$(householdId)).data.memberIds;
+        && mioUid() in get(/databases/$(database)/documents/households/$(householdId)).data.memberIds;
     }
 
-    // Scorciatoia usata dalle collezioni dati: vale sia in lettura
-    // (documento esistente) sia in scrittura (documento in arrivo).
-    function membroDelDocEsistente() {
-      return membroDi(resource.data.householdId);
+    function membroDellaRelazione(relationshipId) {
+      return autenticato()
+        && mioUid() in get(/databases/$(database)/documents/relationships/$(relationshipId)).data.membri;
     }
 
-    function membroDelDocInArrivo() {
-      return membroDi(request.resource.data.householdId);
+    // Il documento (esistente o in arrivo) appartiene a una mia casa?
+    function casaEsistente() { return membroDi(resource.data.householdId); }
+    function casaInArrivo()  { return membroDi(request.resource.data.householdId); }
+
+    // Regola dei contenuti a visibilità multipla (calendario, spese,
+    // salvadanai). Deve rispecchiare esattamente le query in scoped.ts.
+    function leggibileScoped() {
+      return casaEsistente() && (
+        resource.data.visibilita == 'household'
+        || (resource.data.visibilita == 'personale' && resource.data.autore == mioUid())
+        || (resource.data.visibilita == 'coppia'
+            && membroDellaRelazione(resource.data.relationshipId))
+      );
     }
 
-    // ---------- profili utente ----------
+    function scrivibileScoped() {
+      return casaInArrivo() && request.resource.data.autore == mioUid();
+    }
+
+    // ---------------- profili utente ----------------
     match /users/{userId} {
-      // Ognuno scrive solo il proprio profilo...
-      allow write: if autenticato() && request.auth.uid == userId;
-      // ...ma tutti gli autenticati possono LEGGERE i profili, perche' la
-      // schermata "Partecipanti" mostra nome ed email degli altri membri.
+      // Lettura aperta ai soli autenticati: "Partecipanti" mostra nome ed
+      // email degli altri membri, e servono le chiavi pubbliche per l'E2E.
       allow read: if autenticato();
+      allow create, update: if autenticato() && mioUid() == userId;
+      allow delete: if false;
     }
 
-    // ---------- case (household) ----------
+    // ---------------- case ----------------
     match /households/{householdId} {
-      // Lettura aperta agli autenticati: serve per entrare con il codice
-      // invito (joinHouseholdByInviteCode fa una query su inviteCode PRIMA
-      // di essere membro — se qui restringiamo, l'adesione si rompe).
+      // Lettura aperta agli autenticati: chi entra con il codice invito deve
+      // poter cercare la casa PRIMA di esserne membro. Senza questo,
+      // l'adesione non funziona.
       allow read: if autenticato();
 
       allow create: if autenticato()
-        && request.auth.uid in request.resource.data.memberIds;
+        && mioUid() in request.resource.data.memberIds
+        && request.resource.data.ownerId == mioUid();
 
-      // Update: o sei gia' membro, oppure ti stai aggiungendo tu stesso
-      // tramite codice invito.
-      allow update: if autenticato()
-        && (request.auth.uid in resource.data.memberIds
-            || request.auth.uid in request.resource.data.memberIds);
+      // I membri possono aggiornare i dati della casa ma NON la lista dei
+      // membri: entrare e uscire passa dalle Cloud Functions, che agiscono
+      // con privilegi di amministratore.
+      allow update: if membroDi(householdId)
+        && request.resource.data.memberIds == resource.data.memberIds;
 
-      allow delete: if false; // nessuna cancellazione dall'app, per ora
+      allow delete: if false;
     }
 
-    // ---------- collezioni dati della casa ----------
-    // Hanno tutte un campo householdId e vengono filtrate per quello.
-
-    match /bollette/{docId} {
-      allow read:   if membroDelDocEsistente();
-      allow create: if membroDelDocInArrivo();
-      allow update: if membroDelDocEsistente() && membroDelDocInArrivo();
-      allow delete: if membroDelDocEsistente();
+    // ---------------- relazioni di coppia ----------------
+    match /relationships/{relId} {
+      allow read: if casaEsistente();
+      allow create: if casaInArrivo()
+        && mioUid() in request.resource.data.membri
+        && request.resource.data.richiedente == mioUid();
+      // Conferma/aggiornamento: solo i due interessati.
+      allow update: if mioUid() in resource.data.membri;
+      allow delete: if mioUid() in resource.data.membri;
     }
 
-    match /immondizia_tipi/{docId} {
-      allow read:   if membroDelDocEsistente();
-      allow create: if membroDelDocInArrivo();
-      allow update: if membroDelDocEsistente() && membroDelDocInArrivo();
-      allow delete: if membroDelDocEsistente();
+    // ---------------- contenuti a visibilità multipla ----------------
+    match /calendario/{docId} {
+      allow read: if leggibileScoped();
+      allow create: if scrivibileScoped();
+      allow update, delete: if leggibileScoped();
+    }
+    match /spese/{docId} {
+      allow read: if leggibileScoped();
+      allow create: if scrivibileScoped();
+      allow update, delete: if leggibileScoped();
+    }
+    match /salvadanai/{docId} {
+      allow read: if leggibileScoped();
+      allow create: if scrivibileScoped();
+      allow update, delete: if leggibileScoped();
     }
 
-    match /immondizia_straordinarie/{docId} {
-      allow read:   if membroDelDocEsistente();
-      allow create: if membroDelDocInArrivo();
-      allow update: if membroDelDocEsistente() && membroDelDocInArrivo();
-      allow delete: if membroDelDocEsistente();
+    // ---------------- zona intima (cifrata end-to-end) ----------------
+    // Il contenuto è già illeggibile senza la chiave condivisa, ma limitiamo
+    // comunque l'accesso ai due membri della coppia.
+    match /zona_intima/{docId} {
+      allow read, update, delete: if membroDellaRelazione(resource.data.relationshipId);
+      allow create: if membroDellaRelazione(request.resource.data.relationshipId)
+        && request.resource.data.autore == mioUid();
     }
 
-    // NOTA: quando aggiungerai nuovi moduli (pulizie, spese, garanzie...)
-    // duplica uno di questi blocchi cambiando solo il nome della collezione.
-    // Tutto cio' che non e' elencato qui e' vietato per default.
+    // ---------------- salute (strettamente personale) ----------------
+    // Nessun altro membro della casa può leggere questi documenti, nemmeno
+    // il proprietario della casa.
+    match /salute/{docId} {
+      allow read, update, delete: if autenticato() && resource.data.utenteId == mioUid();
+      allow create: if autenticato() && request.resource.data.utenteId == mioUid();
+    }
+
+    // ---------------- collezioni condivise con tutta la casa ----------------
+    // Stesso schema per tutte: campo householdId, accesso ai membri.
+    match /{collezione}/{docId} {
+      allow read: if collezione in [
+            'bollette', 'immondizia_tipi', 'immondizia_straordinarie',
+            'bacheca', 'turni', 'pulizie', 'lista_spesa', 'garanzie',
+            'manutenzione', 'abbonamenti', 'contatti', 'piante',
+            'veicoli', 'animali'
+          ] && casaEsistente();
+
+      allow create: if collezione in [
+            'bollette', 'immondizia_tipi', 'immondizia_straordinarie',
+            'bacheca', 'turni', 'pulizie', 'lista_spesa', 'garanzie',
+            'manutenzione', 'abbonamenti', 'contatti', 'piante',
+            'veicoli', 'animali'
+          ] && casaInArrivo();
+
+      allow update, delete: if collezione in [
+            'bollette', 'immondizia_tipi', 'immondizia_straordinarie',
+            'bacheca', 'turni', 'pulizie', 'lista_spesa', 'garanzie',
+            'manutenzione', 'abbonamenti', 'contatti', 'piante',
+            'veicoli', 'animali'
+          ] && casaEsistente();
+    }
+
+    // Tutto ciò che non è elencato sopra resta vietato.
   }
 }

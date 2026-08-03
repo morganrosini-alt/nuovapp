@@ -41,7 +41,7 @@ export function HouseholdProvider({ children }: { children: React.ReactNode }) {
     // onSnapshot ascolta i cambiamenti in tempo reale sul documento utente
     const unsubscribe = onSnapshot(userRef, async (snapshot) => {
       if (snapshot.exists()) {
-        setProfile(snapshot.data() as UserProfile);
+        setProfile({ id: snapshot.id, ...snapshot.data() } as UserProfile);
         setIsLoading(false);
       } else {
         // Rete di sicurezza: l'utente è autenticato (esiste in Firebase Auth)

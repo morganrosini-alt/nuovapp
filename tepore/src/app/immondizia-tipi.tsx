@@ -10,7 +10,7 @@ import { router } from "expo-router";
 import { useHousehold } from "../hooks/useHousehold";
 import { ascoltaTipiRifiuto, eliminaTipoRifiuto, duplicaTipiPerAnno, coloreTestoLeggibile } from "../services/immondizia";
 import { TipoRifiutoPersonalizzato } from "../types";
-import { fonts } from "../theme";
+import { fonts, shadow } from "../theme";
 
 const GIORNO_BREVE: Record<string, string> = {
   lunedi: "Lun",

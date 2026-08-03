@@ -12,7 +12,7 @@ import {
   coloreTestoLeggibile,
 } from "../services/immondizia";
 import { GiornoSettimana, RaccoltaStraordinaria, TipoRifiutoPersonalizzato } from "../types";
-import { fonts } from "../theme";
+import { fonts, shadow } from "../theme";
 
 const GIORNI_LABEL: Record<GiornoSettimana, string> = {
   lunedi: "Lunedì",
