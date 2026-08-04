@@ -17,6 +17,9 @@ export default function AnimaleDettaglioScreen() {
         { key: "visita", label: "Visita" },
         { key: "altro", label: "Altro" },
       ]}
+      // Le azioni che in una casa condivisa vengono davvero rifatte due
+      // volte per sbaglio: la pastiglia data due volte è un rischio reale.
+      azioniRapide={["Pastiglia", "Cibo", "Passeggiata", "Antiparassitario", "Toelettatura"]}
     />
   );
 }

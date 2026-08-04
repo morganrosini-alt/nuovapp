@@ -18,6 +18,7 @@ export default function VeicoloDettaglioScreen() {
         { key: "tagliando", label: "Tagliando" },
         { key: "altro", label: "Altro" },
       ]}
+      azioniRapide={["Rifornimento", "Lavato", "Olio controllato", "Gomme controllate", "Tagliando"]}
     />
   );
 }

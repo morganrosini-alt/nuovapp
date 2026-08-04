@@ -39,14 +39,42 @@ export default function SaluteScreen() {
   }, [user?.uid]);
 
   const controlli = useMemo(
-    () => voci.filter((v) => v.tipo === "controllo")
+    () => voci.filter((v) => v.tipo === "controllo" && !v.completato)
       .sort((a, b) => (a.prossimaData ?? 0) - (b.prossimaData ?? 0)),
+    [voci]
+  );
+  // Storico: le visite una tantum già fatte. Restano consultabili senza
+  // ingombrare l'elenco di ciò che c'è ancora da fare.
+  const storico = useMemo(
+    () => voci.filter((v) => v.tipo === "controllo" && v.completato)
+      .sort((a, b) => (b.ultimaData ?? 0) - (a.ultimaData ?? 0)),
     [voci]
   );
   const altre = useMemo(
     () => voci.filter((v) => v.tipo !== "controllo").sort((a, b) => b.createdAt - a.createdAt),
     [voci]
   );
+
+  // ⚠️ Prima l'onPress lanciava segnaFatto() senza attenderla e senza
+  // gestire gli errori: se la scrittura falliva non compariva nulla, e
+  // sembrava che il bottone non funzionasse.
+  async function handleFatto(voce: VoceSalute) {
+    try {
+      await segnaFatto(voce);
+      if (voce.ricorrenzaMesi) {
+        const prossima = new Date();
+        prossima.setMonth(prossima.getMonth() + voce.ricorrenzaMesi);
+        Alert.alert(
+          "Segnato come fatto ✓",
+          `Ti ricorderò il prossimo controllo intorno al ${prossima.toLocaleDateString("it-IT", { month: "long", year: "numeric" })}.`
+        );
+      } else {
+        Alert.alert("Segnato come fatto ✓", "Lo trovi ora nello storico qui sotto.");
+      }
+    } catch (e: any) {
+      Alert.alert("Non è stato possibile salvare", e?.message ?? "Riprova tra un momento.");
+    }
+  }
 
   async function aggiungiControllo(titoloVoce: string, mesiRicorrenza: number) {
     if (!user) return;
@@ -125,12 +153,28 @@ export default function SaluteScreen() {
                   {c.ricorrenzaMesi ? ` · ogni ${c.ricorrenzaMesi} mesi` : ""}
                 </Text>
               </View>
-              <TouchableOpacity style={styles.btnFatto} onPress={() => segnaFatto(c)}>
+              <TouchableOpacity style={styles.btnFatto} onPress={() => handleFatto(c)}>
                 <Text style={styles.btnFattoTesto}>Fatto</Text>
               </TouchableOpacity>
             </TouchableOpacity>
           );
         })}
+
+        {/* ---- Storico: le visite una tantum già fatte ---- */}
+        {storico.length > 0 && (
+          <>
+            <Text style={styles.sezione}>Già fatte</Text>
+            {storico.map((v) => (
+              <View key={v.id} style={styles.cardStorico}>
+                <Icona name="check-circle-outline" size={17} color="#4E8C63" />
+                <Text style={styles.storicoTitolo}>{v.titolo}</Text>
+                <Text style={styles.storicoData}>
+                  {v.ultimaData ? new Date(v.ultimaData).toLocaleDateString("it-IT") : ""}
+                </Text>
+              </View>
+            ))}
+          </>
+        )}
 
         {suggerimentiDaMostrare.length > 0 && (
           <>
@@ -245,6 +289,13 @@ const styles = StyleSheet.create({
   statoVoce: { fontSize: 12, color: colors.muted, marginTop: 2, fontFamily: fonts.medium, fontWeight: "500" },
   statoScaduto: { color: colors.danger, fontFamily: fonts.bold, fontWeight: "700" },
   statoVicino: { color: colors.warningInk, fontFamily: fonts.semibold, fontWeight: "600" },
+  cardStorico: {
+    flexDirection: "row", alignItems: "center", gap: 9,
+    backgroundColor: "#F3F7F4", borderRadius: radius.md,
+    paddingVertical: 11, paddingHorizontal: 13, marginBottom: 7,
+  },
+  storicoTitolo: { flex: 1, fontFamily: fonts.semibold, fontWeight: "600", fontSize: 14, color: "#5A6B5F" },
+  storicoData: { fontFamily: fonts.regular, fontSize: 12.5, color: "#8B9B90" },
   btnFatto: { backgroundColor: colors.accent, borderRadius: radius.sm, paddingVertical: 8, paddingHorizontal: 13 },
   btnFattoTesto: { color: "#fff", fontFamily: fonts.bold, fontWeight: "700", fontSize: 12.5 },
   labelSuggerimenti: {

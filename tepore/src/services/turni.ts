@@ -1,6 +1,10 @@
 // src/services/turni.ts
 //
 // Turni di lavoro della casa. Un turno = una persona + un giorno + una fascia.
+//
+// Una persona può avere PIÙ fasce nello stesso giorno (mattina + pomeriggio,
+// il classico spezzato). Fanno eccezione libero, ferie e malattia: sono stati
+// esclusivi, chi è in ferie non è anche di turno la mattina.
 // Visibili a tutti i membri (vedi firestore.rules): servono proprio a
 // coordinarsi quando si programma qualcosa insieme.
 
@@ -22,6 +26,25 @@ export const FASCE: Array<{ key: FasciaTurno; label: string; colore: string; sig
   { key: "ferie",      label: "Ferie",      colore: colors.turnoFerie,      sigla: "F" },
   { key: "malattia",   label: "Malattia",   colore: colors.turnoMalattia,   sigla: "+" },
 ];
+
+/** Fasce che escludono tutte le altre nello stesso giorno. */
+export const FASCE_ESCLUSIVE: FasciaTurno[] = ["libero", "ferie", "malattia"];
+
+export function esclusiva(f: FasciaTurno): boolean {
+  return FASCE_ESCLUSIVE.includes(f);
+}
+
+/**
+ * Cosa va rimosso prima di aggiungere la fascia `nuova` a una persona.
+ * - stato esclusivo  -> cancella tutto il resto del giorno
+ * - fascia di lavoro -> cancella solo gli stati esclusivi
+ * Le fasce di lavoro convivono fra loro.
+ */
+export function turniDaRimuovere(esistenti: Turno[], nuova: FasciaTurno): Turno[] {
+  return esclusiva(nuova)
+    ? esistenti
+    : esistenti.filter((t) => esclusiva(t.fascia));
+}
 
 export function fascia(key: FasciaTurno) {
   return FASCE.find((f) => f.key === key) ?? FASCE[0];

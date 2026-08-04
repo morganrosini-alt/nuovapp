@@ -113,6 +113,10 @@ export default function UtilitaScreen() {
         <Tile icona="paw-outline" nome="Animali" stato="Vaccini, visite, spese"
           bloccato={!sbloccati.has("animali")}
           onPress={() => router.push(sbloccati.has("animali") ? "/animali" : "/paywall")} />
+        <Tile icona="card-account-phone-outline" nome="Contatti utili" stato="Idraulico, elettricista…"
+          onPress={() => router.push("/contatti-utili")} />
+        <Tile icona="alarm-light-outline" nome="Emergenze" stato="Numeri utili sempre pronti"
+          onPress={() => router.push("/emergenza")} />
         <Tile icona="sprout-outline" nome="Piante"
           stato={pianteAssetate > 0 ? `${pianteAssetate} da annaffiare` : "Annaffiatura e cura"}
           urgente={pianteAssetate > 0 && sbloccati.has("piante")}
@@ -120,10 +124,6 @@ export default function UtilitaScreen() {
           onPress={() => router.push(sbloccati.has("piante") ? "/piante" : "/paywall")} />
       </View>
 
-      <Text style={styles.sezioncina}>Sempre a portata</Text>
-      <RigaMin icona="card-account-phone-outline" testo="Contatti utili" onPress={() => router.push("/contatti-utili")} />
-      <RigaMin icona="alarm-light-outline" testo="Numeri di emergenza" onPress={() => router.push("/emergenza")} />
-      <RigaMin icona="cog-outline" testo="Impostazioni" onPress={() => router.push("/impostazioni")} />
     </ScrollView>
   );
 }
@@ -145,16 +145,6 @@ function Tile({ icona, nome, stato, urgente, bloccato, onPress }: {
       <Text style={[styles.tileNome, bloccato && styles.testoBloccato]}>{nome}</Text>
       <Text style={[styles.tileStato, urgente && styles.tileStatoUrgente, bloccato && styles.testoBloccato]}
         numberOfLines={2}>{stato}</Text>
-    </TouchableOpacity>
-  );
-}
-
-function RigaMin({ icona, testo, onPress }: { icona: string; testo: string; onPress: () => void }) {
-  return (
-    <TouchableOpacity style={styles.rigaMin} onPress={onPress}>
-      <Icona name={icona} size={19} color={colors.chipNeutralInk} />
-      <Text style={styles.rigaMinTesto}>{testo}</Text>
-      <Icona name="chevron-right" size={19} color="#C2CCD3" />
     </TouchableOpacity>
   );
 }
@@ -186,14 +176,4 @@ const styles = StyleSheet.create({
     position: "absolute", top: 9, right: 9, width: 18, height: 18, borderRadius: 9,
     backgroundColor: "#A9B4BC", alignItems: "center", justifyContent: "center",
   },
-  sezioncina: {
-    fontSize: 12, fontFamily: fonts.extrabold, fontWeight: "800", color: colors.muted, textTransform: "uppercase",
-    letterSpacing: 0.7, marginTop: 20, marginBottom: 9, marginHorizontal: 2,
-  },
-  rigaMin: {
-    flexDirection: "row", alignItems: "center", gap: 11,
-    backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border,
-    borderRadius: radius.md, paddingVertical: 12, paddingHorizontal: 14, marginBottom: 8,
-  },
-  rigaMinTesto: { flex: 1, fontSize: 13.5, fontFamily: fonts.semibold, fontWeight: "600", color: colors.ink },
 });

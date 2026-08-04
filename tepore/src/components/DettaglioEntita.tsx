@@ -13,12 +13,26 @@ import { doc, onSnapshot, updateDoc, deleteDoc } from "firebase/firestore";
 import { router } from "expo-router";
 import Icona from "./Icona";
 import { db } from "../services/firebase";
-import { ScadenzaEntita, SpesaEntita } from "../types";
+import { ScadenzaEntita, SpesaEntita, AzioneEntita } from "../types";
+import { useAuth } from "../hooks/useAuth";
+import { useHousehold } from "../hooks/useHousehold";
 import ModuloHeader from "./ModuloHeader";
 import CampoData from "./CampoData";
 import { colors, radius, shadow, fonts } from "../theme";
 
 const GIORNO = 24 * 3600e3;
+/** "oggi", "ieri", "3 giorni fa": più utile di una data secca per capire
+ *  a colpo d'occhio se una cosa è già stata fatta di recente. */
+function quandoLeggibile(ts: number): string {
+  const giorni = Math.floor((Date.now() - ts) / GIORNO);
+  if (giorni <= 0) {
+    return `oggi alle ${new Date(ts).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`;
+  }
+  if (giorni === 1) return "ieri";
+  if (giorni < 30) return `${giorni} giorni fa`;
+  return new Date(ts).toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" });
+}
+
 const euro = (n: number) => n.toLocaleString("it-IT", { style: "currency", currency: "EUR" });
 
 type Props = {
@@ -26,20 +40,26 @@ type Props = {
   id: string;
   tipiScadenza: Array<{ key: string; label: string }>;
   titoloModulo: string;
+  /** Azioni ricorrenti proposte con un tocco. Es. "Antiparassitario". */
+  azioniRapide?: string[];
 };
 
 type Entita = {
   nome: string;
   scadenze?: ScadenzaEntita[];
   spese?: SpesaEntita[];
+  azioni?: AzioneEntita[];
 };
 
-export default function DettaglioEntita({ collezione, id, tipiScadenza, titoloModulo }: Props) {
+export default function DettaglioEntita({ collezione, id, tipiScadenza, titoloModulo, azioniRapide = [] }: Props) {
+  const { user } = useAuth();
+  const { profile } = useHousehold();
   const [entita, setEntita] = useState<Entita | null>(null);
   const [tipoNuova, setTipoNuova] = useState(tipiScadenza[0].key);
   const [dataNuova, setDataNuova] = useState(new Date(Date.now() + 30 * GIORNO));
   const [descSpesa, setDescSpesa] = useState("");
   const [importoSpesa, setImportoSpesa] = useState("");
+  const [azioneLibera, setAzioneLibera] = useState("");
 
   useEffect(() => {
     return onSnapshot(doc(db, collezione, id), (snap) => {
@@ -94,6 +114,40 @@ export default function DettaglioEntita({ collezione, id, tipiScadenza, titoloMo
       spese: [...(entita!.spese ?? []), { descrizione: descSpesa.trim(), importo: imp, data: Date.now() }],
     });
     setDescSpesa(""); setImportoSpesa("");
+  }
+
+  // ---- "L'ho fatto io" ----
+  // In una casa condivisa la domanda vera non è "quando va fatto" ma
+  // "l'ha già fatto qualcuno?". Ogni azione registra chi e quando.
+  const azioni = [...(entita.azioni ?? [])].sort((a, b) => b.quando - a.quando);
+
+  async function registraAzione(cosa: string) {
+    const testo = cosa.trim();
+    if (!testo || !user) return;
+    const nuova: AzioneEntita = {
+      cosa: testo,
+      quando: Date.now(),
+      chi: user.uid,
+      // Nome salvato insieme all'uid: lo storico resta leggibile anche se
+      // la persona cambia nome o lascia la casa.
+      chiNome: profile?.displayName?.split(" ")[0] ?? "Qualcuno",
+    };
+    await updateDoc(doc(db, collezione, id), {
+      azioni: [...(entita!.azioni ?? []), nuova],
+    });
+    setAzioneLibera("");
+  }
+
+  function eliminaAzione(azione: AzioneEntita) {
+    Alert.alert("Rimuovere dal registro?", `${azione.cosa} · ${azione.chiNome}`, [
+      { text: "Annulla", style: "cancel" },
+      {
+        text: "Rimuovi", style: "destructive",
+        onPress: () => updateDoc(doc(db, collezione, id), {
+          azioni: (entita!.azioni ?? []).filter((a) => a.quando !== azione.quando),
+        }),
+      },
+    ]);
   }
 
   function eliminaTutto() {
@@ -185,6 +239,58 @@ export default function DettaglioEntita({ collezione, id, tipiScadenza, titoloMo
         </View>
 
         {/* Spese */}
+        {/* ---- Registro: chi ha fatto cosa ---- */}
+        <Text style={styles.sezione}>Cosa è stato fatto</Text>
+
+        {azioniRapide.length > 0 && (
+          <View style={styles.rigaChips}>
+            {azioniRapide.map((a) => (
+              <TouchableOpacity key={a} style={styles.chipAzione} onPress={() => registraAzione(a)}>
+                <Icona name="check" size={14} color={colors.accentDark} />
+                <Text style={styles.chipAzioneTesto}>{a}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        <View style={styles.rigaForm}>
+          <TextInput
+            style={[styles.input, { flex: 1 }]}
+            placeholder="Altro… (es. lavato, controllato)"
+            placeholderTextColor="#B0AAA2"
+            value={azioneLibera}
+            onChangeText={setAzioneLibera}
+            onSubmitEditing={() => registraAzione(azioneLibera)}
+            returnKeyType="done"
+          />
+          <TouchableOpacity
+            style={[styles.btnPiccolo, !azioneLibera.trim() && styles.btnDisabilitato]}
+            onPress={() => registraAzione(azioneLibera)}
+            disabled={!azioneLibera.trim()}>
+            <Text style={styles.btnPiccoloTesto}>Segna</Text>
+          </TouchableOpacity>
+        </View>
+
+        {azioni.length === 0 ? (
+          <Text style={styles.vuoto}>
+            Niente ancora. Ogni cosa che segni qui resta visibile a tutta la casa,
+            con nome e data: così nessuno rifà quello che hai già fatto.
+          </Text>
+        ) : (
+          azioni.slice(0, 15).map((a) => (
+            <TouchableOpacity key={a.quando} style={styles.rigaAzione}
+              onLongPress={() => eliminaAzione(a)} activeOpacity={0.85}>
+              <View style={styles.puntino} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.azioneCosa}>{a.cosa}</Text>
+                <Text style={styles.azioneMeta}>
+                  {a.chi === user?.uid ? "Tu" : a.chiNome} · {quandoLeggibile(a.quando)}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
+
         <Text style={styles.sezione}>Spese</Text>
         <View style={styles.composer}>
           <TextInput style={styles.input} placeholder="Descrizione (es. Cambio gomme)"
@@ -243,6 +349,28 @@ const styles = StyleSheet.create({
     gap: 10, ...shadow.card,
   },
   rigaChips: { flexDirection: "row", gap: 6, flexWrap: "wrap" },
+
+  // ---- registro "L'ho fatto io" ----
+  chipAzione: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    backgroundColor: colors.chipNeutral, borderRadius: 999,
+    paddingVertical: 7, paddingHorizontal: 12,
+  },
+  chipAzioneTesto: { fontSize: 13, fontFamily: fonts.semibold, fontWeight: "600", color: colors.accentDark },
+  rigaForm: { flexDirection: "row", alignItems: "center", gap: 8 },
+  btnPiccolo: {
+    backgroundColor: colors.accent, borderRadius: radius.sm,
+    paddingVertical: 11, paddingHorizontal: 15,
+  },
+  btnDisabilitato: { opacity: 0.4 },
+  btnPiccoloTesto: { color: "#fff", fontFamily: fonts.bold, fontWeight: "700", fontSize: 13 },
+  rigaAzione: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: "#F1EBE4",
+  },
+  puntino: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.accent },
+  azioneCosa: { fontSize: 14.5, fontFamily: fonts.semibold, fontWeight: "600", color: colors.ink },
+  azioneMeta: { fontSize: 12.5, fontFamily: fonts.regular, color: colors.muted, marginTop: 1 },
   chip: { borderRadius: 999, paddingVertical: 5, paddingHorizontal: 12, backgroundColor: colors.chipNeutral },
   chipAttivo: { backgroundColor: colors.accent },
   chipTesto: { fontSize: 12, fontFamily: fonts.semibold, fontWeight: "600", color: colors.chipNeutralInk },

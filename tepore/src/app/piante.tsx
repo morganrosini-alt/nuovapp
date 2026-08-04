@@ -10,16 +10,26 @@ import {
 import Icona from "../components/Icona";
 import { creaServizio } from "../services/crud";
 import { useHousehold } from "../hooks/useHousehold";
+import { useAuth } from "../hooks/useAuth";
 import { Pianta } from "../types";
 import ModuloHeader from "../components/ModuloHeader";
 import { prossimaAnnaffiatura } from "../utils/scadenze";
 import { colors, radius, shadow, fonts } from "../theme";
 
 const servizio = creaServizio<Pianta>("piante");
+
+/** "oggi", "ieri", "3 giorni fa" — più immediato di una data. */
+function giorniDa(ts: number): string {
+  const g = Math.floor((Date.now() - ts) / GIORNO);
+  if (g <= 0) return "oggi";
+  if (g === 1) return "ieri";
+  return `${g} giorni fa`;
+}
 const GIORNO = 24 * 3600e3;
 
 export default function PianteScreen() {
   const { profile } = useHousehold();
+  const { user } = useAuth();
   const householdId = profile?.householdId ?? null;
 
   const [piante, setPiante] = useState<Pianta[]>([]);
@@ -44,6 +54,14 @@ export default function PianteScreen() {
       householdId, nome: nome.trim(), frequenzaGiorni: g, ultimaAnnaffiatura: Date.now(),
     } as any);
     setNome(""); setGiorni("3"); setComposerAperto(false);
+  }
+
+  async function annaffia(p: Pianta) {
+    await servizio.aggiorna(p.id, {
+      ultimaAnnaffiatura: Date.now(),
+      ultimaAnnaffiaturaChi: user?.uid,
+      ultimaAnnaffiaturaNome: profile?.displayName?.split(" ")[0] ?? "Qualcuno",
+    } as any);
   }
 
   function chiediElimina(p: Pianta) {
@@ -102,10 +120,20 @@ export default function PianteScreen() {
                 <Text style={[styles.stato, daFare && styles.statoUrgente]}>
                   {daFare ? "Da annaffiare! 💧" : `Tra ${giorniMancanti} gg · ogni ${item.frequenzaGiorni}`}
                 </Text>
+                {/* Chi e quando: evita che due persone annaffino lo stesso
+                    giorno pensando che l'altro se ne fosse dimenticato. */}
+                {item.ultimaAnnaffiaturaNome && (
+                  <Text style={styles.ultimaVolta}>
+                    Ultima:{" "}
+                    {item.ultimaAnnaffiaturaChi === user?.uid ? "tu" : item.ultimaAnnaffiaturaNome}
+                    {" · "}
+                    {giorniDa(item.ultimaAnnaffiatura)}
+                  </Text>
+                )}
               </View>
               <TouchableOpacity
                 style={[styles.bottoneAcqua, !daFare && styles.bottoneAcquaSoft]}
-                onPress={() => servizio.aggiorna(item.id, { ultimaAnnaffiatura: Date.now() } as any)}
+                onPress={() => annaffia(item)}
               >
                 <Icona name="water" size={18} color={daFare ? "#fff" : colors.accentDark} />
               </TouchableOpacity>
@@ -159,5 +187,6 @@ const styles = StyleSheet.create({
   },
   bottoneAcquaSoft: { backgroundColor: colors.accentSoft },
   vuoto: { color: colors.muted, textAlign: "center", marginTop: 40, lineHeight: 20 },
+  ultimaVolta: { fontSize: 12, fontFamily: fonts.regular, color: colors.muted, marginTop: 2 },
   suggerimento: { color: colors.muted, fontSize: 11, textAlign: "center", paddingBottom: 12 },
 });

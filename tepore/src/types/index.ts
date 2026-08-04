@@ -278,6 +278,22 @@ export type SpesaEntita = {
   data: number;
 };
 
+/**
+ * Una cosa che è stata fatta, e da chi.
+ *
+ * È il cuore di "L'ho fatto io": in una casa condivisa la domanda vera non è
+ * "quando va data la pastiglia" ma "gliel'ha già data qualcuno stamattina?".
+ * Il nome viene salvato insieme all'uid (denormalizzato) così lo storico
+ * resta leggibile anche offline e anche se la persona lascia la casa.
+ */
+export type AzioneEntita = {
+  cosa: string;          // "Antiparassitario", "Rifornimento", "Annaffiata"
+  quando: number;        // timestamp ms
+  chi: string;           // uid di chi l'ha fatto
+  chiNome: string;       // nome al momento dell'azione
+  note?: string;
+};
+
 export type Veicolo = {
   id: string;
   householdId: string;
@@ -286,6 +302,7 @@ export type Veicolo = {
   targa?: string;
   scadenze: ScadenzaEntita[];
   spese: SpesaEntita[];
+  azioni?: AzioneEntita[];
   createdAt: number;
 };
 
@@ -296,6 +313,7 @@ export type Animale = {
   specie: "cane" | "gatto" | "altro";
   scadenze: ScadenzaEntita[];
   spese: SpesaEntita[];
+  azioni?: AzioneEntita[];
   createdAt: number;
 };
 
@@ -305,6 +323,11 @@ export type Pianta = {
   nome: string;
   frequenzaGiorni: number;       // ogni quanti giorni annaffiare
   ultimaAnnaffiatura: number;
+  // Chi ha annaffiato l'ultima volta. In una casa condivisa è l'informazione
+  // che evita la doppia annaffiatura — che per una pianta è più dannosa
+  // di una saltata.
+  ultimaAnnaffiaturaChi?: string;
+  ultimaAnnaffiaturaNome?: string;
   note?: string;
   createdAt: number;
 };
@@ -341,6 +364,8 @@ export type VoceSalute = {
   titolo: string;            // "Pulizia denti", "Vitamina D", "Allergia polline"
   prossimaData?: number;     // per i controlli
   ricorrenzaMesi?: number;   // 6 = ogni sei mesi
+  ultimaData?: number;       // quando è stata fatta l'ultima volta
+  completato?: boolean;      // voce una tantum archiviata
   note?: string;
   createdAt: number;
 };

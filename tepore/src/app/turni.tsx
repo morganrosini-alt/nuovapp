@@ -13,6 +13,7 @@ import { useHousehold } from "../hooks/useHousehold";
 import { getHousehold, getUserProfilesByIds } from "../services/household";
 import {
   ascoltaTurni, salvaTurno, eliminaTurno, turniDelGiorno, FASCE, fascia, aMezzanotte,
+  turniDaRimuovere,
 } from "../services/turni";
 import { FasciaTurno, Turno, UserProfile } from "../types";
 import ModuloHeader from "../components/ModuloHeader";
@@ -66,14 +67,29 @@ export default function TurniScreen() {
     membri.find((m) => m.id === uid)?.displayName ?? (uid === user?.uid ? "Tu" : "Membro");
   const inizialeDi = (uid: string) => (nomeDi(uid) ?? "?").charAt(0).toUpperCase();
 
+  // Ora si possono selezionare PIÙ fasce nello stesso giorno (mattina +
+  // pomeriggio). Premere una fascia già attiva la toglie, così lo stesso
+  // gesto serve per mettere e per correggere. Il pannello resta aperto:
+  // chi fa lo spezzato ne aggiunge due di fila senza riaprirlo.
   async function aggiungi(giorno: Date, f: FasciaTurno) {
     if (!householdId || !chiSel) return;
-    const esistente = turniDelGiorno(turni, giorno).find((t) => t.utenteId === chiSel);
-    if (esistente) await eliminaTurno(esistente.id);   // un turno per persona al giorno
+    const miei = turniDelGiorno(turni, giorno).filter((t) => t.utenteId === chiSel);
+
+    const gia = miei.find((t) => t.fascia === f);
+    if (gia) { await eliminaTurno(gia.id); return; }   // toggle: la rimuove
+
+    for (const t of turniDaRimuovere(miei, f)) await eliminaTurno(t.id);
     await salvaTurno({
       householdId, utenteId: chiSel, giorno: aMezzanotte(giorno), fascia: f,
     });
-    setGiornoAperto(null);
+  }
+
+  /** Fasce già assegnate alla persona selezionata in quel giorno. */
+  function fasceAttive(giorno: Date): FasciaTurno[] {
+    if (!chiSel) return [];
+    return turniDelGiorno(turni, giorno)
+      .filter((t) => t.utenteId === chiSel)
+      .map((t) => t.fascia);
   }
 
   function chiediElimina(t: Turno) {
@@ -143,18 +159,30 @@ export default function TurniScreen() {
                 <Text style={styles.nessunTurno}>Nessun turno segnato</Text>
               )}
 
-              {delGiorno.map((t) => {
-                const f = fascia(t.fascia);
+              {/* Una riga per PERSONA, non per turno: chi fa mattina e
+                  pomeriggio compare una volta sola con due pastiglie,
+                  invece che due volte con lo stesso nome. */}
+              {Array.from(new Set(delGiorno.map((t) => t.utenteId))).map((uid) => {
+                const suoi = delGiorno.filter((t) => t.utenteId === uid);
                 return (
-                  <TouchableOpacity key={t.id} style={styles.rigaPersona} onLongPress={() => chiediElimina(t)}>
-                    <View style={[styles.avatarP, { backgroundColor: t.utenteId === user?.uid ? colors.accent : colors.chipNeutralInk }]}>
-                      <Text style={styles.avatarPTesto}>{inizialeDi(t.utenteId)}</Text>
+                  <View key={uid} style={styles.rigaPersona}>
+                    <View style={[styles.avatarP, { backgroundColor: uid === user?.uid ? colors.accent : colors.chipNeutralInk }]}>
+                      <Text style={styles.avatarPTesto}>{inizialeDi(uid)}</Text>
                     </View>
-                    <Text style={styles.nomeP}>{t.utenteId === user?.uid ? "Tu" : nomeDi(t.utenteId)}</Text>
-                    <View style={[styles.chipFascia, { backgroundColor: f.colore }]}>
-                      <Text style={styles.chipFasciaTesto}>{f.label}</Text>
+                    <Text style={styles.nomeP}>{uid === user?.uid ? "Tu" : nomeDi(uid)}</Text>
+                    <View style={styles.gruppoFasce}>
+                      {suoi.map((t) => {
+                        const f = fascia(t.fascia);
+                        return (
+                          <TouchableOpacity key={t.id}
+                            style={[styles.chipFascia, { backgroundColor: f.colore }]}
+                            onLongPress={() => chiediElimina(t)}>
+                            <Text style={styles.chipFasciaTesto}>{f.label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
                     </View>
-                  </TouchableOpacity>
+                  </View>
                 );
               })}
 
@@ -176,17 +204,31 @@ export default function TurniScreen() {
                       </View>
                     </>
                   )}
-                  <Text style={styles.labelSel}>Fascia</Text>
+                  <Text style={styles.labelSel}>Fasce · puoi sceglierne più di una</Text>
                   <View style={styles.rigaChips}>
-                    {FASCE.map((f) => (
-                      <TouchableOpacity key={f.key}
-                        style={[styles.chipFasciaSel, { borderColor: f.colore }]}
-                        onPress={() => aggiungi(g, f.key)}>
-                        <View style={[styles.legDot, { backgroundColor: f.colore }]} />
-                        <Text style={styles.chipFasciaSelTesto}>{f.label}</Text>
-                      </TouchableOpacity>
-                    ))}
+                    {FASCE.map((f) => {
+                      const attiva = fasceAttive(g).includes(f.key);
+                      return (
+                        <TouchableOpacity key={f.key}
+                          style={[
+                            styles.chipFasciaSel,
+                            { borderColor: f.colore },
+                            attiva && { backgroundColor: f.colore, borderWidth: 2 },
+                          ]}
+                          onPress={() => aggiungi(g, f.key)}>
+                          <View style={[styles.legDot, { backgroundColor: f.colore }]} />
+                          <Text style={[styles.chipFasciaSelTesto, attiva && styles.chipFasciaSelTestoAttivo]}>
+                            {f.label}
+                          </Text>
+                          {attiva && <Icona name="check" size={13} color="#3A2C22" />}
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
+                  <Text style={styles.notaSel}>
+                    Tocca di nuovo una fascia per toglierla. Libero, ferie e malattia
+                    sostituiscono le altre.
+                  </Text>
                 </View>
               )}
             </View>
@@ -233,6 +275,9 @@ const styles = StyleSheet.create({
   btnAggiungi: { backgroundColor: colors.accentSoft, borderRadius: 999, paddingVertical: 4, paddingHorizontal: 11 },
   btnAggiungiTesto: { fontSize: 11, fontFamily: fonts.bold, fontWeight: "700", color: colors.accentDark },
   nessunTurno: { fontSize: 12, color: colors.muted, fontFamily: fonts.medium, fontWeight: "500", paddingVertical: 3 },
+  gruppoFasce: { flexDirection: "row", gap: 5, flexWrap: "wrap", justifyContent: "flex-end", flexShrink: 1 },
+  chipFasciaSelTestoAttivo: { fontFamily: fonts.extrabold, fontWeight: "800", color: "#3A2C22" },
+  notaSel: { fontFamily: fonts.regular, fontSize: 12, color: "#9AA5AC", marginTop: 8, lineHeight: 17 },
   rigaPersona: { flexDirection: "row", alignItems: "center", gap: 9, paddingVertical: 5 },
   avatarP: { width: 27, height: 27, borderRadius: 14, alignItems: "center", justifyContent: "center" },
   avatarPTesto: { fontSize: 11, fontFamily: fonts.extrabold, fontWeight: "800", color: "#fff" },

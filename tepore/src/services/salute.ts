@@ -48,11 +48,29 @@ export async function eliminaVoce(id: string): Promise<void> {
 }
 
 /** Sposta un controllo in avanti di una ricorrenza ("fatto oggi"). */
+// ⚠️ CORRETTO: prima questa funzione spostava sempre la data avanti di 12
+// mesi anche per le voci SENZA ricorrenza. Su una visita una tantum non
+// cambiava nulla di percepibile e sembrava che il bottone fosse morto.
+// Inoltre non teneva traccia di quando la visita era stata fatta davvero.
 export async function segnaFatto(voce: VoceSalute): Promise<void> {
-  const mesi = voce.ricorrenzaMesi ?? 12;
-  const prossima = new Date();
-  prossima.setMonth(prossima.getMonth() + mesi);
-  await aggiornaVoce(voce.id, { prossimaData: prossima.getTime() });
+  const adesso = Date.now();
+
+  if (voce.ricorrenzaMesi) {
+    // Controllo periodico: registra la data di oggi e programma il prossimo.
+    const prossima = new Date();
+    prossima.setMonth(prossima.getMonth() + voce.ricorrenzaMesi);
+    await aggiornaVoce(voce.id, {
+      ultimaData: adesso,
+      prossimaData: prossima.getTime(),
+    });
+  } else {
+    // Voce una tantum: si archivia. Resta consultabile nello storico.
+    await aggiornaVoce(voce.id, {
+      ultimaData: adesso,
+      prossimaData: undefined,
+      completato: true,
+    });
+  }
 }
 
 /** Le MIE voci di salute, in tempo reale. */

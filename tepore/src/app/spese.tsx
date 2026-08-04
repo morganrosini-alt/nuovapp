@@ -164,10 +164,33 @@ export default function SpeseScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.titoloVoce}>{item.titolo}</Text>
-                <Text style={styles.dettagli}>
-                  {new Date(item.data).toLocaleDateString("it-IT", { day: "numeric", month: "short" })}
-                  {item.visibilita !== "household" ? ` · ${VISIBILITA[item.visibilita]}` : ""}
-                </Text>
+                <View style={styles.rigaMeta}>
+                  <Text style={styles.dettagli}>
+                    {new Date(item.data).toLocaleDateString("it-IT", { day: "numeric", month: "short" })}
+                  </Text>
+                  {/* Badge di visibilità: prima era testo grigio in coda alla
+                      data e si perdeva nella lista. Ora è una pastiglia
+                      colorata — blu per "Solo io", rosa per "Coppia" — così
+                      si distingue con un'occhiata. */}
+                  {item.visibilita !== "household" && (
+                    <View style={[
+                      styles.badgeVis,
+                      item.visibilita === "personale" ? styles.badgePersonale : styles.badgeCoppia,
+                    ]}>
+                      <Icona
+                        name={item.visibilita === "personale" ? "lock-outline" : "heart-outline"}
+                        size={11}
+                        color={item.visibilita === "personale" ? "#1B6CA8" : "#B5446E"}
+                      />
+                      <Text style={[
+                        styles.badgeVisTesto,
+                        item.visibilita === "personale" ? styles.badgeTestoPersonale : styles.badgeTestoCoppia,
+                      ]}>
+                        {VISIBILITA[item.visibilita]}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
               <Text style={styles.importoVoce}>{euro(item.importo)}</Text>
             </TouchableOpacity>
@@ -195,6 +218,18 @@ const styles = StyleSheet.create({
   },
   rigaChips: { flexDirection: "row", gap: 6, flexWrap: "wrap" },
   chip: { borderRadius: 999, paddingVertical: 5, paddingHorizontal: 12, backgroundColor: colors.chipNeutral },
+
+  rigaMeta: { flexDirection: "row", alignItems: "center", gap: 7, marginTop: 2, flexWrap: "wrap" },
+  badgeVis: {
+    flexDirection: "row", alignItems: "center", gap: 3,
+    borderRadius: 999, paddingVertical: 2, paddingHorizontal: 7,
+    borderWidth: 1,
+  },
+  badgePersonale: { backgroundColor: "#E4F1FB", borderColor: "#A9D3F0" },
+  badgeCoppia:    { backgroundColor: "#FBE9F0", borderColor: "#F0C0D3" },
+  badgeVisTesto:  { fontSize: 11, fontFamily: fonts.bold, fontWeight: "700" },
+  badgeTestoPersonale: { color: "#1B6CA8" },
+  badgeTestoCoppia:    { color: "#B5446E" },
   chipAttivo: { backgroundColor: colors.accent },
   chipTesto: { fontSize: 12, fontFamily: fonts.semibold, fontWeight: "600", color: colors.chipNeutralInk },
   chipTestoAttivo: { color: "#fff" },
